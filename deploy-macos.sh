@@ -91,11 +91,49 @@ fi
 # Deploy API to Workers
 echo ""
 echo -e "${BLUE}🚀 Deploying API to Cloudflare Workers...${NC}"
-wrangler deploy
 
-WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
-echo -e "${GREEN}✅ API deployed successfully!${NC}"
-echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
+# Capture deployment output to check for errors
+DEPLOY_OUTPUT=$(wrangler deploy 2>&1)
+DEPLOY_STATUS=$?
+
+if [ $DEPLOY_STATUS -eq 0 ]; then
+    WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
+    echo -e "${GREEN}✅ API deployed successfully!${NC}"
+    echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
+else
+    echo -e "${RED}❌ API deployment failed${NC}"
+    echo "$DEPLOY_OUTPUT"
+    
+    # Check for subdomain conflicts
+    if echo "$DEPLOY_OUTPUT" | grep -q "subdomain.*already.*taken\|name.*already.*exists\|already.*in.*use\|Script name.*already exists"; then
+        echo ""
+        echo -e "${YELLOW}⚠️  The subdomain '$API_NAME' is already taken by another user.${NC}"
+        echo -e "${BLUE}💡 Suggested alternatives:${NC}"
+        echo -e "   • $API_NAME-$(date +%s)"
+        echo -e "   • $API_NAME-masjid"
+        echo -e "   • $API_NAME-$(whoami)"
+        echo ""
+        read -p "Enter a new API name: " NEW_API_NAME
+        if [ -n "$NEW_API_NAME" ]; then
+            # Update wrangler.toml with new name
+            sed "s/name = \"$API_NAME\"/name = \"$NEW_API_NAME\"/" wrangler.toml > wrangler.toml.tmp && mv wrangler.toml.tmp wrangler.toml
+            API_NAME="$NEW_API_NAME"
+            echo -e "${BLUE}🔄 Retrying deployment with: $API_NAME${NC}"
+            if wrangler deploy; then
+                WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
+                echo -e "${GREEN}✅ API deployed successfully with new name!${NC}"
+                echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
+            else
+                echo -e "${RED}❌ Deployment failed again.${NC}"
+                WORKER_URL="https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+            fi
+        else
+            WORKER_URL="https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+        fi
+    else
+        WORKER_URL="https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+    fi
+fi
 
 # Update the test interface to use the new API URL
 echo -e "${BLUE}📝 Updating test interface...${NC}"

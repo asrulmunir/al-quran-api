@@ -23,16 +23,19 @@
 git clone https://github.com/asrulmunir/al-quran-api.git
 cd al-quran-api
 
-# Option 1: Standard deployment
+# Option 1: Smart deployment with conflict handling (recommended)
+./deploy-smart.sh
+
+# Option 2: Standard deployment
 ./deploy.sh
 
-# Option 2: macOS-optimized (recommended for macOS users)
+# Option 3: macOS-optimized
 ./deploy-macos.sh
 
-# Option 3: Maximum stability with error handling
+# Option 4: Maximum stability with error handling
 ./deploy-stable.sh
 
-# Option 4: Simple deployment without advanced features
+# Option 5: Simple deployment without advanced features
 ./deploy-simple.sh
 ```
 
@@ -209,6 +212,35 @@ wrangler pages deploy public --project-name=your-project-name
 - ✅ Rate limiting ready (optional)
 - ✅ Environment variables support
 - ✅ No sensitive data in code
+- ✅ **Subdomain conflict handling** - automatic retry with new names
+- ✅ **Input validation** - prevents invalid project names
+
+## ⚠️ Common Issues & Solutions
+
+### **Subdomain Already Taken**
+If you see errors like "subdomain already taken" or "name already exists":
+
+```bash
+# Use the smart deployment script (handles conflicts automatically)
+./deploy-smart.sh
+
+# Or manually choose unique names:
+# Instead of: quran-api
+# Try: quran-api-masjid, quran-api-2024, my-quran-api
+```
+
+### **Name Requirements**
+- **Workers**: Only letters, numbers, and hyphens (max 63 characters)
+- **Pages**: Only letters, numbers, and hyphens
+- **Avoid**: Special characters, spaces, underscores
+
+### **Deployment Failures**
+```bash
+# Check your internet connection
+# Ensure you're logged into Cloudflare: wrangler login
+# Try a different name if subdomain conflicts occur
+# Use deploy-smart.sh for automatic conflict resolution
+```
 
 ## 📊 Data Source & Attribution
 

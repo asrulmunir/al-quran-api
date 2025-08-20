@@ -111,13 +111,51 @@ fi
 # Deploy API to Workers
 echo ""
 echo -e "${BLUE}🚀 Deploying API to Cloudflare Workers...${NC}"
-wrangler deploy
 
-# Get the deployed URL - construct it directly from the API name
-WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
+# Capture deployment output to check for errors
+DEPLOY_OUTPUT=$(wrangler deploy 2>&1)
+DEPLOY_STATUS=$?
 
-echo -e "${GREEN}✅ API deployed successfully!${NC}"
-echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
+if [ $DEPLOY_STATUS -eq 0 ]; then
+    WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
+    echo -e "${GREEN}✅ API deployed successfully!${NC}"
+    echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
+else
+    echo -e "${RED}❌ API deployment failed${NC}"
+    echo "$DEPLOY_OUTPUT"
+    
+    # Check for common error patterns
+    if echo "$DEPLOY_OUTPUT" | grep -q "subdomain.*already.*taken\|name.*already.*exists\|already.*in.*use\|Script name.*already exists"; then
+        echo ""
+        echo -e "${YELLOW}⚠️  The subdomain '$API_NAME' is already taken by another user.${NC}"
+        echo -e "${BLUE}💡 Try a different name:${NC}"
+        echo -e "   • $API_NAME-$(date +%s)"
+        echo -e "   • $API_NAME-masjid"
+        echo -e "   • $API_NAME-$(whoami)"
+        echo ""
+        read -p "Enter a new API name: " NEW_API_NAME
+        if [ -n "$NEW_API_NAME" ]; then
+            # Update wrangler.toml with new name
+            sed "s/name = \"$API_NAME\"/name = \"$NEW_API_NAME\"/" wrangler.toml > wrangler.toml.tmp && mv wrangler.toml.tmp wrangler.toml
+            API_NAME="$NEW_API_NAME"
+            echo -e "${BLUE}🔄 Retrying deployment with new name: $API_NAME${NC}"
+            if wrangler deploy; then
+                WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
+                echo -e "${GREEN}✅ API deployed successfully with new name!${NC}"
+                echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
+            else
+                echo -e "${RED}❌ Deployment failed again. Please try manually with a different name.${NC}"
+                WORKER_URL="https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+            fi
+        else
+            echo -e "${YELLOW}⚠️  Skipping retry. You can deploy manually later.${NC}"
+            WORKER_URL="https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Deployment failed for unknown reason. Check the error above.${NC}"
+        WORKER_URL="https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+    fi
+fi
 
 # Update the test interface to use the new API URL
 echo -e "${BLUE}📝 Updating test interface...${NC}"
@@ -133,18 +171,54 @@ echo -e "${YELLOW}Note: This may take a few moments...${NC}"
 # Simple deployment approach without timeout (for macOS compatibility)
 echo -e "${BLUE}Running: wrangler pages deploy public --project-name=\"$PAGES_NAME\" --commit-dirty=true${NC}"
 
-# Direct deployment without timeout to ensure macOS compatibility
-if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
+# Capture Pages deployment output to check for errors
+PAGES_OUTPUT=$(wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true 2>&1)
+PAGES_STATUS=$?
+
+if [ $PAGES_STATUS -eq 0 ]; then
     echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
     PAGES_URL="https://$PAGES_NAME.pages.dev"
     ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
     echo -e "${YELLOW}📝 Note: The actual URL may have a hash prefix like: https://abc123.$PAGES_NAME.pages.dev${NC}"
 else
-    echo -e "${YELLOW}⚠️  Pages deployment encountered an issue${NC}"
+    echo -e "${RED}❌ Pages deployment failed${NC}"
+    echo "$PAGES_OUTPUT"
+    
+    # Check for Pages naming conflicts
+    if echo "$PAGES_OUTPUT" | grep -q "project.*already.*exists\|name.*already.*taken\|already.*in.*use"; then
+        echo ""
+        echo -e "${YELLOW}⚠️  The Pages project name '$PAGES_NAME' is already taken.${NC}"
+        echo -e "${BLUE}💡 Try a different name:${NC}"
+        echo -e "   • $PAGES_NAME-$(date +%s)"
+        echo -e "   • $PAGES_NAME-interface"
+        echo -e "   • $PAGES_NAME-$(whoami)"
+        echo ""
+        read -p "Enter a new Pages project name: " NEW_PAGES_NAME
+        if [ -n "$NEW_PAGES_NAME" ]; then
+            PAGES_NAME="$NEW_PAGES_NAME"
+            echo -e "${BLUE}🔄 Retrying Pages deployment with new name: $PAGES_NAME${NC}"
+            if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
+                echo -e "${GREEN}✅ Pages deployed successfully with new name!${NC}"
+                PAGES_URL="https://$PAGES_NAME.pages.dev"
+                ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
+            else
+                echo -e "${RED}❌ Pages deployment failed again.${NC}"
+                PAGES_URL="https://$PAGES_NAME.pages.dev (deployment failed)"
+                ALIAS_URL="https://main.$PAGES_NAME.pages.dev (deployment failed)"
+            fi
+        else
+            echo -e "${YELLOW}⚠️  Skipping Pages retry.${NC}"
+            PAGES_URL="https://$PAGES_NAME.pages.dev (deployment failed)"
+            ALIAS_URL="https://main.$PAGES_NAME.pages.dev (deployment failed)"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Pages deployment failed for unknown reason.${NC}"
+        PAGES_URL="https://$PAGES_NAME.pages.dev (deployment failed)"
+        ALIAS_URL="https://main.$PAGES_NAME.pages.dev (deployment failed)"
+    fi
+    
     echo -e "${YELLOW}   You can deploy manually later with:${NC}"
     echo -e "${BLUE}   wrangler pages deploy public --project-name=$PAGES_NAME${NC}"
-    PAGES_URL="https://$PAGES_NAME.pages.dev (manual deployment needed)"
-    ALIAS_URL="https://main.$PAGES_NAME.pages.dev (manual deployment needed)"
 fi
 
 echo ""
