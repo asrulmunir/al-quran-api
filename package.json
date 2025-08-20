@@ -1,0 +1,27 @@
+{
+  "name": "al-quran-api",
+  "version": "1.0.0",
+  "description": "🕌 Al-Quran API - Deploy Your Own Quran API on Cloudflare Workers",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "prepare-data": "node scripts/convert-xml-to-json.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "xmldom": "^0.6.0"
+  },
+  "keywords": ["quran", "al-quran", "api", "cloudflare", "workers", "islamic", "tanzil", "arabic", "search"],
+  "author": "Al-Quran API Community",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abumuaaz/al-quran-api.git"
+  },
+  "homepage": "https://github.com/abumuaaz/al-quran-api#readme",
+  "bugs": {
+    "url": "https://github.com/abumuaaz/al-quran-api/issues"
+  }
+}

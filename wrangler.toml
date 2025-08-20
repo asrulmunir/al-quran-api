@@ -1,0 +1,11 @@
+name = "al-quran-api"
+main = "src/index.js"
+compatibility_date = "2023-12-01"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Cloudflare Workers limits:
+# - Script size: 1MB compressed, 10MB uncompressed
+# - Memory: 128MB
+# - CPU time: 50ms per request (can burst to 1000ms)

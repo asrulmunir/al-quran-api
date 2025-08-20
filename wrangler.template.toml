@@ -1,0 +1,28 @@
+# 🕌 JQuranTree API Configuration Template
+# Copy this to wrangler.toml and customize for your deployment
+
+name = "YOUR-API-NAME"  # Change this to your unique API name
+main = "src/index.js"
+compatibility_date = "2023-12-01"
+
+# Optional: Add your custom domain
+# routes = [
+#   { pattern = "api.yourmasjid.org/*", zone_name = "yourmasjid.org" }
+# ]
+
+[vars]
+ENVIRONMENT = "production"
+
+# Optional: Add rate limiting
+# RATE_LIMIT_PER_HOUR = "1000"
+
+# Optional: Add custom branding
+# ORGANIZATION_NAME = "Your Masjid Name"
+# CONTACT_EMAIL = "admin@yourmasjid.org"
+
+# Cloudflare Workers limits:
+# - Script size: 1MB compressed, 10MB uncompressed
+# - Memory: 128MB
+# - CPU time: 50ms per request (can burst to 1000ms)
+# - Free tier: 100,000 requests/day
+# - Paid tier: $5/month for 10M requests
