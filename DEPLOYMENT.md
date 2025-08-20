@@ -22,8 +22,8 @@
 ### Step 1: Fork & Clone
 ```bash
 # Fork this repository on GitHub, then clone your fork
-git clone https://github.com/YOUR-USERNAME/jqurantree-rovo.git
-cd jqurantree-rovo
+git clone https://github.com/asrulmunir/al-quran-api.git
+cd al-quran-api
 ```
 
 ### Step 2: Install Dependencies

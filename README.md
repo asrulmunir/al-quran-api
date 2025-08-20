@@ -6,7 +6,7 @@
 
 ```bash
 # Clone and deploy your own instance
-git clone https://github.com/abumuaaz/al-quran-api.git
+git clone https://github.com/asrulmunir/al-quran-api.git
 cd al-quran-api
 ./deploy.sh
 ```
