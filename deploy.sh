@@ -74,7 +74,39 @@ fi
 
 # Update wrangler.toml with user's API name
 echo -e "${BLUE}📝 Updating configuration...${NC}"
-sed -i.bak "s/name = \"quran-api\"/name = \"$API_NAME\"/" wrangler.toml
+sed -i.bak "s/name = \"al-quran-api\"/name = \"$API_NAME\"/" wrangler.toml
+
+# Verify the update worked
+if grep -q "name = \"$API_NAME\"" wrangler.toml; then
+    echo -e "${GREEN}✅ Configuration updated successfully${NC}"
+else
+    echo -e "${RED}❌ Failed to update configuration${NC}"
+    exit 1
+fi
+
+# Verify the update worked
+if grep -q "name = \"$API_NAME\"" wrangler.toml; then
+    echo -e "${GREEN}✅ Configuration updated successfully${NC}"
+else
+    echo -e "${RED}❌ Failed to update configuration${NC}"
+    exit 1
+fi
+
+# Verify the update worked
+if grep -q "name = \"$API_NAME\"" wrangler.toml; then
+    echo -e "${GREEN}✅ Configuration updated successfully${NC}"
+else
+    echo -e "${RED}❌ Failed to update configuration${NC}"
+    exit 1
+fi
+
+# Verify the update worked
+if grep -q "name = \"$API_NAME\"" wrangler.toml; then
+    echo -e "${GREEN}✅ Configuration updated successfully${NC}"
+else
+    echo -e "${RED}❌ Failed to update configuration${NC}"
+    exit 1
+fi
 
 # Deploy API to Workers
 echo ""
