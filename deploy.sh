@@ -130,19 +130,61 @@ echo ""
 echo -e "${BLUE}🌐 Deploying test interface to Cloudflare Pages...${NC}"
 echo -e "${YELLOW}Note: This may take a few moments...${NC}"
 
-# Simple deployment without output capture to avoid script termination
-if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
+# Deploy and capture output to a temporary file
+wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true > pages_output.tmp 2>&1
+DEPLOY_STATUS=$?
+
+if [ $DEPLOY_STATUS -eq 0 ]; then
     echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
-    # Use standard URL format since we can't reliably extract the hash
-    PAGES_URL="https://$PAGES_NAME.pages.dev"
-    ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
-    echo -e "${YELLOW}📝 Note: The actual URL may have a hash prefix. Check Cloudflare Dashboard for exact URL.${NC}"
+    
+    # Try to extract the actual URL from the deployment output
+    PAGES_URL=$(grep -o 'https://[a-zA-Z0-9.-]*\.pages\.dev' pages_output.tmp | head -1)
+    
+    # If extraction fails, construct URL using account info
+    if [ -z "$PAGES_URL" ]; then
+        # Get account email from wrangler whoami - look for the specific email pattern
+        ACCOUNT_EMAIL=$(wrangler whoami 2>/dev/null | grep -o 'asrulmunir@gmail.com' || echo "")
+        if [ -n "$ACCOUNT_EMAIL" ]; then
+            # Extract username part before @ and convert to lowercase
+            ACCOUNT_USER=$(echo "$ACCOUNT_EMAIL" | cut -d'@' -f1 | tr '[:upper:]' '[:lower:]')
+            PAGES_URL="https://$PAGES_NAME.$ACCOUNT_USER.pages.dev"
+            ALIAS_URL="https://main.$PAGES_NAME.$ACCOUNT_USER.pages.dev"
+        else
+            # Try generic email extraction as fallback
+            ACCOUNT_EMAIL=$(wrangler whoami 2>/dev/null | grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' | head -1)
+            if [ -n "$ACCOUNT_EMAIL" ]; then
+                ACCOUNT_USER=$(echo "$ACCOUNT_EMAIL" | cut -d'@' -f1 | tr '[:upper:]' '[:lower:]')
+                PAGES_URL="https://$PAGES_NAME.$ACCOUNT_USER.pages.dev"
+                ALIAS_URL="https://main.$PAGES_NAME.$ACCOUNT_USER.pages.dev"
+            else
+                # Final fallback
+                PAGES_URL="https://$PAGES_NAME.pages.dev"
+                ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
+            fi
+        fi
+    else
+        # Construct alias URL from extracted URL
+        if [[ "$PAGES_URL" == *"."*".pages.dev" ]]; then
+            ACCOUNT_PART=$(echo "$PAGES_URL" | sed 's|https://[^.]*\.||' | sed 's|\.pages\.dev||')
+            ALIAS_URL="https://main.$PAGES_NAME.$ACCOUNT_PART.pages.dev"
+        else
+            ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
+        fi
+    fi
+    
+    echo -e "${YELLOW}📝 Note: The actual URL may have a hash prefix like: https://abc123.$PAGES_NAME.asrulmunir.pages.dev${NC}"
 else
     echo -e "${RED}❌ Pages deployment failed${NC}"
+    echo -e "${YELLOW}Deployment output:${NC}"
+    cat pages_output.tmp
+    echo ""
     echo -e "${YELLOW}⚠️  You can deploy manually later with: wrangler pages deploy public --project-name=$PAGES_NAME${NC}"
-    PAGES_URL="https://$PAGES_NAME.pages.dev (manual deployment needed)"
+    PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
     ALIAS_URL=""
 fi
+
+# Clean up temporary file
+rm -f pages_output.tmp
 
 echo ""
 echo -e "${GREEN}🎉 Deployment Complete!${NC}"
