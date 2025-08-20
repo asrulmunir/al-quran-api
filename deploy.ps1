@@ -78,13 +78,68 @@ $wranglerContent | Set-Content "wrangler.toml"
 # Deploy API to Workers
 Write-Host ""
 Write-Host "🚀 Deploying API to Cloudflare Workers..." -ForegroundColor Blue
-wrangler deploy
 
-# Construct Worker URL
-$WORKER_URL = "https://$API_NAME.asrulmunir.workers.dev"
-
-Write-Host "✅ API deployed successfully!" -ForegroundColor Green
-Write-Host "   API URL: $WORKER_URL" -ForegroundColor Green
+# Capture deployment output to check for errors
+try {
+    $deployOutput = wrangler deploy 2>&1 | Out-String
+    $deploySuccess = $LASTEXITCODE -eq 0
+    
+    if ($deploySuccess) {
+        $WORKER_URL = "https://$API_NAME.asrulmunir.workers.dev"
+        Write-Host "✅ API deployed successfully!" -ForegroundColor Green
+        Write-Host "   API URL: $WORKER_URL" -ForegroundColor Green
+    } else {
+        Write-Host "❌ API deployment failed" -ForegroundColor Red
+        Write-Host $deployOutput -ForegroundColor Yellow
+        
+        # Check for subdomain conflicts
+        if ($deployOutput -match "subdomain.*already.*taken|name.*already.*exists|already.*in.*use|Script name.*already exists") {
+            Write-Host ""
+            Write-Host "⚠️  The subdomain '$API_NAME' is already taken by another user." -ForegroundColor Yellow
+            Write-Host "💡 Suggested alternatives:" -ForegroundColor Blue
+            $timestamp = [int][double]::Parse((Get-Date -UFormat %s))
+            Write-Host "   • $API_NAME-$timestamp"
+            Write-Host "   • $API_NAME-masjid"
+            Write-Host "   • $API_NAME-$env:USERNAME"
+            Write-Host "   • my-$API_NAME"
+            Write-Host ""
+            
+            $NEW_API_NAME = Read-Host "Enter a new API name (or press Enter to auto-generate)"
+            if ([string]::IsNullOrWhiteSpace($NEW_API_NAME)) {
+                $NEW_API_NAME = "$API_NAME-$timestamp"
+                Write-Host "Auto-generated name: $NEW_API_NAME" -ForegroundColor Yellow
+            }
+            
+            # Update wrangler.toml with new name
+            $wranglerContent = Get-Content "wrangler.toml" -Raw
+            $wranglerContent = $wranglerContent -replace "name = `"$API_NAME`"", "name = `"$NEW_API_NAME`""
+            $wranglerContent | Set-Content "wrangler.toml"
+            $API_NAME = $NEW_API_NAME
+            
+            Write-Host "🔄 Retrying deployment with: $API_NAME" -ForegroundColor Blue
+            try {
+                wrangler deploy
+                if ($LASTEXITCODE -eq 0) {
+                    $WORKER_URL = "https://$API_NAME.asrulmunir.workers.dev"
+                    Write-Host "✅ API deployed successfully with new name!" -ForegroundColor Green
+                    Write-Host "   API URL: $WORKER_URL" -ForegroundColor Green
+                } else {
+                    Write-Host "❌ Deployment failed again." -ForegroundColor Red
+                    $WORKER_URL = "https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+                }
+            } catch {
+                Write-Host "❌ Deployment failed again." -ForegroundColor Red
+                $WORKER_URL = "https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+            }
+        } else {
+            Write-Host "⚠️  Deployment failed for unknown reason." -ForegroundColor Yellow
+            $WORKER_URL = "https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+        }
+    }
+} catch {
+    Write-Host "❌ Deployment error: $_" -ForegroundColor Red
+    $WORKER_URL = "https://$API_NAME.asrulmunir.workers.dev (deployment failed)"
+}
 
 # Update the test interface to use the new API URL
 Write-Host "📝 Updating test interface..." -ForegroundColor Blue
@@ -95,23 +150,73 @@ $indexContent | Set-Content "public/index.html"
 # Deploy Pages
 Write-Host ""
 Write-Host "🌐 Deploying test interface to Cloudflare Pages..." -ForegroundColor Blue
-$pagesOutput = wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true 2>&1
+Write-Host "Note: This may take a few moments..." -ForegroundColor Yellow
 
-# Extract actual Pages URL from output
-$PAGES_URL = ""
-foreach ($line in $pagesOutput) {
-    if ($line -match "https://[a-zA-Z0-9]+\.$PAGES_NAME\.pages\.dev") {
-        $PAGES_URL = $matches[0]
-        break
+try {
+    $pagesOutput = wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true 2>&1 | Out-String
+    $pagesSuccess = $LASTEXITCODE -eq 0
+    
+    if ($pagesSuccess) {
+        Write-Host "✅ Pages deployed successfully!" -ForegroundColor Green
+        
+        # Try to extract actual URL from output
+        $urlMatch = [regex]::Match($pagesOutput, 'https://[a-zA-Z0-9.-]*\.pages\.dev')
+        if ($urlMatch.Success) {
+            $PAGES_URL = $urlMatch.Value
+        } else {
+            $PAGES_URL = "https://$PAGES_NAME.pages.dev"
+        }
+        
+        Write-Host "📝 Note: The actual URL may have a hash prefix." -ForegroundColor Yellow
+    } else {
+        Write-Host "❌ Pages deployment failed" -ForegroundColor Red
+        Write-Host $pagesOutput -ForegroundColor Yellow
+        
+        # Check for Pages naming conflicts
+        if ($pagesOutput -match "project.*already.*exists|name.*already.*taken|already.*in.*use") {
+            Write-Host ""
+            Write-Host "⚠️  The Pages project name '$PAGES_NAME' is already taken." -ForegroundColor Yellow
+            Write-Host "💡 Suggested alternatives:" -ForegroundColor Blue
+            $timestamp = [int][double]::Parse((Get-Date -UFormat %s))
+            Write-Host "   • $PAGES_NAME-$timestamp"
+            Write-Host "   • $PAGES_NAME-interface"
+            Write-Host "   • $PAGES_NAME-$env:USERNAME"
+            Write-Host "   • my-$PAGES_NAME"
+            Write-Host ""
+            
+            $NEW_PAGES_NAME = Read-Host "Enter a new Pages project name (or press Enter to auto-generate)"
+            if ([string]::IsNullOrWhiteSpace($NEW_PAGES_NAME)) {
+                $NEW_PAGES_NAME = "$PAGES_NAME-$timestamp"
+                Write-Host "Auto-generated name: $NEW_PAGES_NAME" -ForegroundColor Yellow
+            }
+            
+            $PAGES_NAME = $NEW_PAGES_NAME
+            Write-Host "🔄 Retrying Pages deployment with: $PAGES_NAME" -ForegroundColor Blue
+            
+            try {
+                wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "✅ Pages deployed successfully with new name!" -ForegroundColor Green
+                    $PAGES_URL = "https://$PAGES_NAME.pages.dev"
+                } else {
+                    Write-Host "❌ Pages deployment failed again." -ForegroundColor Red
+                    $PAGES_URL = "https://$PAGES_NAME.pages.dev (deployment failed)"
+                }
+            } catch {
+                Write-Host "❌ Pages deployment failed again." -ForegroundColor Red
+                $PAGES_URL = "https://$PAGES_NAME.pages.dev (deployment failed)"
+            }
+        } else {
+            Write-Host "⚠️  Pages deployment failed for unknown reason." -ForegroundColor Yellow
+            $PAGES_URL = "https://$PAGES_NAME.pages.dev (deployment failed)"
+        }
+        
+        Write-Host "   You can deploy manually later with:" -ForegroundColor Yellow
+        Write-Host "   wrangler pages deploy public --project-name=$PAGES_NAME" -ForegroundColor Blue
     }
-}
-
-# Fallback URL if extraction fails
-if ([string]::IsNullOrWhiteSpace($PAGES_URL)) {
-    $PAGES_URL = "https://$PAGES_NAME.pages.dev"
-    Write-Host "⚠️  Using fallback URL. Check Cloudflare Dashboard for exact URL." -ForegroundColor Yellow
-} else {
-    Write-Host "✅ Pages deployed successfully!" -ForegroundColor Green
+} catch {
+    Write-Host "❌ Pages deployment error: $_" -ForegroundColor Red
+    $PAGES_URL = "https://$PAGES_NAME.pages.dev (deployment failed)"
 }
 
 Write-Host ""

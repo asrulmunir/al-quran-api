@@ -10,6 +10,13 @@
 ✅ **Node.js**: Version 16+ required  
 ✅ **Git**: Required for cloning  
 
+### **Windows-Specific Features**
+- **PowerShell Smart Script**: `deploy-windows-smart.ps1` with advanced error handling
+- **Batch Script**: `deploy.bat` with conflict detection
+- **Auto-generated Names**: Timestamp and username-based suggestions
+- **Input Validation**: Character and length restrictions
+- **Multiple Retries**: Up to 3 attempts with different names
+
 ### **Prerequisites**
 - [Node.js](https://nodejs.org/) (v16 or higher)
 - [Git](https://git-scm.com/)
@@ -44,6 +51,11 @@ cd al-quran-api
 # Clone and deploy your own instance
 git clone https://github.com/asrulmunir/al-quran-api.git
 cd al-quran-api
+
+# Option 1: Smart deployment with conflict handling (recommended)
+.\deploy-windows-smart.ps1
+
+# Option 2: Standard PowerShell deployment
 .\deploy.ps1
 ```
 
@@ -52,6 +64,8 @@ cd al-quran-api
 # Clone and deploy your own instance
 git clone https://github.com/asrulmunir/al-quran-api.git
 cd al-quran-api
+
+# Standard batch deployment (with conflict handling)
 deploy.bat
 ```
 
