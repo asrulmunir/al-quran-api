@@ -41,23 +41,27 @@ npm install -g wrangler
 wrangler login
 ```
 
-### Step 4: Configure Your API
+### Step 4: Deploy with One-Click Script
+
+#### **macOS/Linux**
 ```bash
-# Edit wrangler.toml - change the name to something unique
-# Example: quran-api-yourname or quran-api-masjid-name
+./deploy.sh
 ```
 
-### Step 5: Deploy API
-```bash
-# Deploy to Cloudflare Workers
-wrangler deploy
+#### **Windows (PowerShell)**
+```powershell
+.\deploy.ps1
 ```
 
-### Step 6: Deploy Test Interface
-```bash
-# Deploy the web interface to Cloudflare Pages
-wrangler pages deploy public --project-name=YOUR-PROJECT-NAME
+#### **Windows (Command Prompt)**
+```cmd
+deploy.bat
 ```
+
+### Step 5: Customize (Optional)
+The script will ask for:
+- API name (e.g., `quran-api-yourname`)
+- Pages project name (e.g., `quran-interface-yourname`)
 
 ## 🎉 That's It!
 

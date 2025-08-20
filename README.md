@@ -2,13 +2,43 @@
 
 **Deploy a complete Quran API in under 5 minutes!** A modern RESTful API for accessing and analyzing the Holy Quran, designed for easy deployment on Cloudflare Workers.
 
+## 💻 Cross-Platform Compatibility
+
+✅ **Windows 10/11**: PowerShell, Command Prompt, or WSL  
+✅ **macOS**: Terminal with bash/zsh  
+✅ **Linux**: Any distribution with bash  
+✅ **Node.js**: Version 16+ required  
+✅ **Git**: Required for cloning  
+
+### **Prerequisites**
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [Git](https://git-scm.com/)
+- [Cloudflare Account](https://dash.cloudflare.com/sign-up) (free)
+
 ## 🚀 One-Click Deployment
 
+### **macOS/Linux**
 ```bash
 # Clone and deploy your own instance
 git clone https://github.com/asrulmunir/al-quran-api.git
 cd al-quran-api
 ./deploy.sh
+```
+
+### **Windows (PowerShell)**
+```powershell
+# Clone and deploy your own instance
+git clone https://github.com/asrulmunir/al-quran-api.git
+cd al-quran-api
+.\deploy.ps1
+```
+
+### **Windows (Command Prompt)**
+```cmd
+# Clone and deploy your own instance
+git clone https://github.com/asrulmunir/al-quran-api.git
+cd al-quran-api
+deploy.bat
 ```
 
 **That's it!** Your Quran API will be live in minutes. 🎉
