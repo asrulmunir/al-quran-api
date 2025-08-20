@@ -136,15 +136,15 @@ echo -e "${BLUE}Running: wrangler pages deploy public --project-name=\"$PAGES_NA
 # Direct deployment without timeout to ensure macOS compatibility
 if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
     echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
-    PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev"
-    ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev"
-    echo -e "${YELLOW}📝 Note: The actual URL may have a hash prefix like: https://abc123.$PAGES_NAME.asrulmunir.pages.dev${NC}"
+    PAGES_URL="https://$PAGES_NAME.pages.dev"
+    ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
+    echo -e "${YELLOW}📝 Note: The actual URL may have a hash prefix like: https://abc123.$PAGES_NAME.pages.dev${NC}"
 else
     echo -e "${YELLOW}⚠️  Pages deployment encountered an issue${NC}"
     echo -e "${YELLOW}   You can deploy manually later with:${NC}"
     echo -e "${BLUE}   wrangler pages deploy public --project-name=$PAGES_NAME${NC}"
-    PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
-    ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
+    PAGES_URL="https://$PAGES_NAME.pages.dev (manual deployment needed)"
+    ALIAS_URL="https://main.$PAGES_NAME.pages.dev (manual deployment needed)"
 fi
 
 echo ""

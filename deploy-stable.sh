@@ -150,11 +150,11 @@ fi
 
 # Construct URLs
 if [ "$PAGES_DEPLOYED" = true ]; then
-    PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev"
-    ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev"
+    PAGES_URL="https://$PAGES_NAME.pages.dev"
+    ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
 else
-    PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
-    ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
+    PAGES_URL="https://$PAGES_NAME.pages.dev (manual deployment needed)"
+    ALIAS_URL="https://main.$PAGES_NAME.pages.dev (manual deployment needed)"
 fi
 
 # Display results

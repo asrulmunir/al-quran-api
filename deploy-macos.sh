@@ -110,13 +110,13 @@ echo -e "${BLUE}Press Ctrl+C if it hangs for more than 5 minutes${NC}"
 # Simple deployment without timeout dependency
 if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
     echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
-    PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev"
-    ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev"
+    PAGES_URL="https://$PAGES_NAME.pages.dev"
+    ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
     PAGES_SUCCESS=true
 else
     echo -e "${YELLOW}⚠️  Pages deployment encountered an issue${NC}"
-    PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
-    ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
+    PAGES_URL="https://$PAGES_NAME.pages.dev (manual deployment needed)"
+    ALIAS_URL="https://main.$PAGES_NAME.pages.dev (manual deployment needed)"
     PAGES_SUCCESS=false
 fi
 
