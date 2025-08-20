@@ -130,17 +130,17 @@ echo ""
 echo -e "${BLUE}🌐 Deploying test interface to Cloudflare Pages...${NC}"
 echo -e "${YELLOW}Note: This may take a few moments...${NC}"
 
-# Simple deployment approach to prevent crashes
+# Simple deployment approach without timeout (for macOS compatibility)
 echo -e "${BLUE}Running: wrangler pages deploy public --project-name=\"$PAGES_NAME\" --commit-dirty=true${NC}"
 
-# Use timeout to prevent hanging and simple success/failure check
-if timeout 180 wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
+# Direct deployment without timeout to ensure macOS compatibility
+if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
     echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
     PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev"
     ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev"
     echo -e "${YELLOW}📝 Note: The actual URL may have a hash prefix like: https://abc123.$PAGES_NAME.asrulmunir.pages.dev${NC}"
 else
-    echo -e "${YELLOW}⚠️  Pages deployment timed out or encountered an issue${NC}"
+    echo -e "${YELLOW}⚠️  Pages deployment encountered an issue${NC}"
     echo -e "${YELLOW}   You can deploy manually later with:${NC}"
     echo -e "${BLUE}   wrangler pages deploy public --project-name=$PAGES_NAME${NC}"
     PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"

@@ -26,10 +26,13 @@ cd al-quran-api
 # Option 1: Standard deployment
 ./deploy.sh
 
-# Option 2: If you encounter issues, use the stable version
+# Option 2: macOS-optimized (recommended for macOS users)
+./deploy-macos.sh
+
+# Option 3: Maximum stability with error handling
 ./deploy-stable.sh
 
-# Option 3: Simple deployment without advanced features
+# Option 4: Simple deployment without advanced features
 ./deploy-simple.sh
 ```
 

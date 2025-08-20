@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# 🕌 Al-Quran API - Stable Deployment Script
+# 🕌 Al-Quran API - macOS Deployment Script
 # Deploy your own Quran API on Cloudflare Workers in minutes!
+# Optimized for macOS without external dependencies
 
-echo "🕌 Al-Quran API Stable Deployment"
-echo "================================="
+echo "🕌 Al-Quran API macOS Deployment"
+echo "================================"
 echo ""
 
 # Colors for output
@@ -13,12 +14,6 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
-
-# Function to handle errors gracefully
-handle_error() {
-    echo -e "${RED}❌ Error occurred: $1${NC}"
-    echo -e "${YELLOW}⚠️  Continuing with deployment...${NC}"
-}
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then
@@ -37,12 +32,12 @@ echo -e "${GREEN}✅ Node.js and npm are installed${NC}"
 
 # Install dependencies
 echo -e "${BLUE}📦 Installing dependencies...${NC}"
-npm install || handle_error "Failed to install dependencies"
+npm install
 
 # Install Wrangler globally if not already installed
 if ! command -v wrangler &> /dev/null; then
     echo -e "${BLUE}🔧 Installing Wrangler CLI...${NC}"
-    npm install -g wrangler || handle_error "Failed to install Wrangler"
+    npm install -g wrangler
 else
     echo -e "${GREEN}✅ Wrangler CLI is already installed${NC}"
 fi
@@ -52,7 +47,7 @@ echo -e "${BLUE}🔐 Checking Cloudflare authentication...${NC}"
 if ! wrangler whoami &> /dev/null; then
     echo -e "${YELLOW}⚠️  You need to login to Cloudflare first${NC}"
     echo -e "${BLUE}🚀 Opening Cloudflare login...${NC}"
-    wrangler login || handle_error "Failed to login to Cloudflare"
+    wrangler login
 else
     echo -e "${GREEN}✅ Already logged in to Cloudflare${NC}"
 fi
@@ -78,96 +73,66 @@ fi
 
 # Create backups
 echo -e "${BLUE}📝 Creating backups...${NC}"
-cp wrangler.toml wrangler.toml.backup || handle_error "Failed to backup wrangler.toml"
-cp public/index.html public/index.html.backup || handle_error "Failed to backup index.html"
+cp wrangler.toml wrangler.toml.backup
+cp public/index.html public/index.html.backup
 
 # Update wrangler.toml with user's API name
 echo -e "${BLUE}📝 Updating configuration...${NC}"
-if sed "s/name = \"al-quran-api\"/name = \"$API_NAME\"/" wrangler.toml.backup > wrangler.toml; then
+sed "s/name = \"al-quran-api\"/name = \"$API_NAME\"/" wrangler.toml.backup > wrangler.toml
+
+# Verify the update worked
+if grep -q "name = \"$API_NAME\"" wrangler.toml; then
     echo -e "${GREEN}✅ Configuration updated successfully${NC}"
 else
-    handle_error "Failed to update configuration"
+    echo -e "${RED}❌ Failed to update configuration${NC}"
     exit 1
 fi
 
 # Deploy API to Workers
 echo ""
 echo -e "${BLUE}🚀 Deploying API to Cloudflare Workers...${NC}"
-if wrangler deploy; then
-    WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
-    echo -e "${GREEN}✅ API deployed successfully!${NC}"
-    echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
-else
-    handle_error "API deployment failed"
-    WORKER_URL="https://$API_NAME.asrulmunir.workers.dev (deployment may have failed)"
-fi
+wrangler deploy
+
+WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
+echo -e "${GREEN}✅ API deployed successfully!${NC}"
+echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
 
 # Update the test interface to use the new API URL
 echo -e "${BLUE}📝 Updating test interface...${NC}"
-if sed "s|https://quran-api.asrulmunir.workers.dev|$WORKER_URL|g" public/index.html.backup > public/index.html; then
-    echo -e "${GREEN}✅ Test interface updated${NC}"
-else
-    handle_error "Failed to update test interface"
-fi
+sed "s|https://quran-api.asrulmunir.workers.dev|$WORKER_URL|g" public/index.html.backup > public/index.html
 
-# Deploy Pages with maximum stability
+# Deploy Pages (macOS-friendly approach)
 echo ""
 echo -e "${BLUE}🌐 Deploying test interface to Cloudflare Pages...${NC}"
 echo -e "${YELLOW}Note: This may take a few moments. Please be patient...${NC}"
+echo -e "${BLUE}Press Ctrl+C if it hangs for more than 5 minutes${NC}"
 
-# Check if timeout command is available (Linux) or use gtimeout (macOS with coreutils)
-TIMEOUT_CMD=""
-if command -v timeout &> /dev/null; then
-    TIMEOUT_CMD="timeout 300"
-elif command -v gtimeout &> /dev/null; then
-    TIMEOUT_CMD="gtimeout 300"
-fi
-
-# Use timeout if available, otherwise deploy directly
-PAGES_DEPLOYED=false
-if [ -n "$TIMEOUT_CMD" ]; then
-    echo -e "${BLUE}Using timeout protection...${NC}"
-    if $TIMEOUT_CMD wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
-        echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
-        PAGES_DEPLOYED=true
-    else
-        echo -e "${YELLOW}⚠️  Pages deployment timed out or failed${NC}"
-    fi
-else
-    echo -e "${BLUE}Deploying without timeout (macOS compatibility)...${NC}"
-    if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
-        echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
-        PAGES_DEPLOYED=true
-    else
-        echo -e "${YELLOW}⚠️  Pages deployment failed${NC}"
-    fi
-fi
-
-if [ "$PAGES_DEPLOYED" = false ]; then
-    echo -e "${YELLOW}   You can deploy manually later with:${NC}"
-    echo -e "${BLUE}   wrangler pages deploy public --project-name=$PAGES_NAME${NC}"
-fi
-
-# Construct URLs
-if [ "$PAGES_DEPLOYED" = true ]; then
+# Simple deployment without timeout dependency
+if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
+    echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
     PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev"
     ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev"
+    PAGES_SUCCESS=true
 else
+    echo -e "${YELLOW}⚠️  Pages deployment encountered an issue${NC}"
     PAGES_URL="https://$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
     ALIAS_URL="https://main.$PAGES_NAME.asrulmunir.pages.dev (manual deployment needed)"
+    PAGES_SUCCESS=false
 fi
 
 # Display results
 echo ""
-echo -e "${GREEN}🎉 Deployment Summary${NC}"
-echo -e "${GREEN}=====================${NC}"
+echo -e "${GREEN}🎉 Deployment Complete!${NC}"
+echo -e "${GREEN}========================${NC}"
 echo ""
 echo -e "${GREEN}📖 Your Quran API:${NC}"
 echo -e "   ${BLUE}$WORKER_URL${NC}"
 echo ""
 echo -e "${GREEN}🌐 Test Interface:${NC}"
 echo -e "   ${BLUE}$PAGES_URL${NC}"
-echo -e "   ${BLUE}$ALIAS_URL${NC}"
+if [ "$PAGES_SUCCESS" = true ]; then
+    echo -e "   ${BLUE}$ALIAS_URL${NC}"
+fi
 echo ""
 echo -e "${GREEN}📊 API Endpoints:${NC}"
 echo -e "   ${BLUE}$WORKER_URL/api/info${NC}"
@@ -177,7 +142,7 @@ echo ""
 
 # Test the API
 echo -e "${BLUE}🧪 Testing your API...${NC}"
-if curl -s --max-time 10 "$WORKER_URL/api/info" > /dev/null 2>&1; then
+if curl -s "$WORKER_URL/api/info" > /dev/null 2>&1; then
     echo -e "${GREEN}✅ API is working correctly!${NC}"
 else
     echo -e "${YELLOW}⚠️  API might still be propagating. Try again in a few minutes.${NC}"
@@ -194,7 +159,7 @@ echo -e "   • Add your custom domain in Cloudflare Dashboard"
 echo -e "   • Share with your masjid/community"
 echo ""
 
-if [ "$PAGES_DEPLOYED" = false ]; then
+if [ "$PAGES_SUCCESS" = false ]; then
     echo -e "${YELLOW}📝 Manual Pages Deployment:${NC}"
     echo -e "   If Pages deployment failed, run this command manually:"
     echo -e "   ${BLUE}wrangler pages deploy public --project-name=$PAGES_NAME${NC}"
@@ -207,12 +172,12 @@ echo -e "${GREEN}Barakallahu feekum! 🤲${NC}"
 echo ""
 echo -e "${BLUE}🔄 Restoring original configuration files...${NC}"
 if [ -f "wrangler.toml.backup" ]; then
-    mv wrangler.toml.backup wrangler.toml && echo -e "${GREEN}✅ wrangler.toml restored${NC}"
+    mv wrangler.toml.backup wrangler.toml
+    echo -e "${GREEN}✅ wrangler.toml restored${NC}"
 fi
 if [ -f "public/index.html.backup" ]; then
-    mv public/index.html.backup public/index.html && echo -e "${GREEN}✅ index.html restored${NC}"
+    mv public/index.html.backup public/index.html
+    echo -e "${GREEN}✅ index.html restored${NC}"
 fi
 
-echo -e "${GREEN}✅ Deployment script completed!${NC}"
-echo ""
-echo -e "${BLUE}💡 Tip: If you encounter issues, try the manual deployment commands above.${NC}"
+echo -e "${GREEN}✅ Deployment script completed successfully!${NC}"
