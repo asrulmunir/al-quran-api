@@ -95,10 +95,24 @@ $indexContent | Set-Content "public/index.html"
 # Deploy Pages
 Write-Host ""
 Write-Host "🌐 Deploying test interface to Cloudflare Pages..." -ForegroundColor Blue
-wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true
+$pagesOutput = wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true 2>&1
 
-# Get Pages URL
-$PAGES_URL = "https://$PAGES_NAME.pages.dev"
+# Extract actual Pages URL from output
+$PAGES_URL = ""
+foreach ($line in $pagesOutput) {
+    if ($line -match "https://[a-zA-Z0-9]+\.$PAGES_NAME\.pages\.dev") {
+        $PAGES_URL = $matches[0]
+        break
+    }
+}
+
+# Fallback URL if extraction fails
+if ([string]::IsNullOrWhiteSpace($PAGES_URL)) {
+    $PAGES_URL = "https://$PAGES_NAME.pages.dev"
+    Write-Host "⚠️  Using fallback URL. Check Cloudflare Dashboard for exact URL." -ForegroundColor Yellow
+} else {
+    Write-Host "✅ Pages deployed successfully!" -ForegroundColor Green
+}
 
 Write-Host ""
 Write-Host "🎉 Deployment Complete!" -ForegroundColor Green
@@ -109,6 +123,7 @@ Write-Host "   $WORKER_URL" -ForegroundColor Blue
 Write-Host ""
 Write-Host "🌐 Test Interface:" -ForegroundColor Green
 Write-Host "   $PAGES_URL" -ForegroundColor Blue
+Write-Host "   Alias: https://main.$PAGES_NAME.pages.dev" -ForegroundColor Blue
 Write-Host ""
 Write-Host "📊 API Endpoints:" -ForegroundColor Green
 Write-Host "   $WORKER_URL/api/info" -ForegroundColor Blue

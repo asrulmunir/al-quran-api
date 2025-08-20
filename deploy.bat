@@ -92,9 +92,19 @@ powershell -command "(Get-Content 'public/index.html') -replace 'https://quran-a
 REM Deploy Pages
 echo.
 echo 🌐 Deploying test interface to Cloudflare Pages...
-wrangler pages deploy public --project-name=%PAGES_NAME% --commit-dirty=true
+wrangler pages deploy public --project-name=%PAGES_NAME% --commit-dirty=true > pages_output.tmp 2>&1
 
-set PAGES_URL=https://%PAGES_NAME%.pages.dev
+REM Try to extract actual URL, fallback to standard format
+for /f "tokens=*" %%i in ('findstr /r "https://.*\.%PAGES_NAME%\.pages\.dev" pages_output.tmp 2^>nul') do set PAGES_URL_LINE=%%i
+if defined PAGES_URL_LINE (
+    for /f "tokens=2" %%j in ("%PAGES_URL_LINE%") do set PAGES_URL=%%j
+) else (
+    set PAGES_URL=https://%PAGES_NAME%.pages.dev
+    echo ⚠️  Using fallback URL. Check Cloudflare Dashboard for exact URL.
+)
+
+REM Clean up temp file
+del pages_output.tmp 2>nul
 
 echo.
 echo 🎉 Deployment Complete!
@@ -105,6 +115,7 @@ echo    %WORKER_URL%
 echo.
 echo 🌐 Test Interface:
 echo    %PAGES_URL%
+echo    Alias: https://main.%PAGES_NAME%.pages.dev
 echo.
 echo 📊 API Endpoints:
 echo    %WORKER_URL%/api/info

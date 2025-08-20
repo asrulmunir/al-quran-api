@@ -128,10 +128,24 @@ awk -v old_url="https://quran-api.asrulmunir.workers.dev" -v new_url="$WORKER_UR
 # Deploy Pages
 echo ""
 echo -e "${BLUE}🌐 Deploying test interface to Cloudflare Pages...${NC}"
-wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true
+PAGES_DEPLOY_OUTPUT=$(wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true 2>&1)
 
-# Get Pages URL (simplified)
-PAGES_URL="https://$PAGES_NAME.pages.dev"
+# Extract the actual Pages URL from deployment output
+PAGES_URL=$(echo "$PAGES_DEPLOY_OUTPUT" | grep -o 'https://[a-zA-Z0-9]*\.'"$PAGES_NAME"'\.pages\.dev' | head -1)
+ALIAS_URL=$(echo "$PAGES_DEPLOY_OUTPUT" | grep -o 'https://main\.'"$PAGES_NAME"'\.pages\.dev' | head -1)
+
+# Use alias URL as primary if main URL extraction fails
+if [ -z "$PAGES_URL" ] && [ -n "$ALIAS_URL" ]; then
+    PAGES_URL="$ALIAS_URL"
+fi
+
+# Final fallback to standard URL if both extractions fail
+if [ -z "$PAGES_URL" ]; then
+    PAGES_URL="https://$PAGES_NAME.pages.dev"
+    echo -e "${YELLOW}⚠️  Using fallback URL. Check Cloudflare Dashboard for exact URL.${NC}"
+else
+    echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
+fi
 
 echo ""
 echo -e "${GREEN}🎉 Deployment Complete!${NC}"
@@ -142,6 +156,9 @@ echo -e "   ${BLUE}$WORKER_URL${NC}"
 echo ""
 echo -e "${GREEN}🌐 Test Interface:${NC}"
 echo -e "   ${BLUE}$PAGES_URL${NC}"
+if [ -n "$ALIAS_URL" ] && [ "$PAGES_URL" != "$ALIAS_URL" ]; then
+    echo -e "   ${BLUE}Alias: $ALIAS_URL${NC}"
+fi
 echo ""
 echo -e "${GREEN}📊 API Endpoints:${NC}"
 echo -e "   ${BLUE}$WORKER_URL/api/info${NC}"
