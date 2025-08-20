@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 🕌 Al-Quran API - One-Click Deployment Script
+# 🕌 Al-Quran API - Robust Deployment Script
 # Deploy your own Quran API on Cloudflare Workers in minutes!
 
 set -e
 
-echo "🕌 Al-Quran API Deployment Script"
-echo "=================================="
+echo "🕌 Al-Quran API Robust Deployment"
+echo "================================="
 echo ""
 
 # Colors for output
@@ -61,7 +61,7 @@ echo ""
 # API Name
 read -p "Enter your API name (e.g., quran-api-masjid): " API_NAME
 if [ -z "$API_NAME" ]; then
-    API_NAME="quran-api-$(date +%s)"
+    API_NAME="al-quran-api-$(date +%s)"
     echo -e "${YELLOW}Using default name: $API_NAME${NC}"
 fi
 
@@ -72,33 +72,14 @@ if [ -z "$PAGES_NAME" ]; then
     echo -e "${YELLOW}Using default name: $PAGES_NAME${NC}"
 fi
 
+# Create backup of original files
+echo -e "${BLUE}📝 Creating backups...${NC}"
+cp wrangler.toml wrangler.toml.backup
+cp public/index.html public/index.html.backup
+
 # Update wrangler.toml with user's API name
 echo -e "${BLUE}📝 Updating configuration...${NC}"
-sed -i.bak "s/name = \"al-quran-api\"/name = \"$API_NAME\"/" wrangler.toml
-
-# Verify the update worked
-if grep -q "name = \"$API_NAME\"" wrangler.toml; then
-    echo -e "${GREEN}✅ Configuration updated successfully${NC}"
-else
-    echo -e "${RED}❌ Failed to update configuration${NC}"
-    exit 1
-fi
-
-# Verify the update worked
-if grep -q "name = \"$API_NAME\"" wrangler.toml; then
-    echo -e "${GREEN}✅ Configuration updated successfully${NC}"
-else
-    echo -e "${RED}❌ Failed to update configuration${NC}"
-    exit 1
-fi
-
-# Verify the update worked
-if grep -q "name = \"$API_NAME\"" wrangler.toml; then
-    echo -e "${GREEN}✅ Configuration updated successfully${NC}"
-else
-    echo -e "${RED}❌ Failed to update configuration${NC}"
-    exit 1
-fi
+sed "s/name = \"al-quran-api\"/name = \"$API_NAME\"/" wrangler.toml.backup > wrangler.toml
 
 # Verify the update worked
 if grep -q "name = \"$API_NAME\"" wrangler.toml; then
@@ -113,35 +94,28 @@ echo ""
 echo -e "${BLUE}🚀 Deploying API to Cloudflare Workers...${NC}"
 wrangler deploy
 
-# Get the deployed URL - construct it directly from the API name
 WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
-
 echo -e "${GREEN}✅ API deployed successfully!${NC}"
 echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
 
 # Update the test interface to use the new API URL
 echo -e "${BLUE}📝 Updating test interface...${NC}"
-# Create backup and use awk for more reliable replacement
-cp public/index.html public/index.html.bak
-awk -v old_url="https://quran-api.asrulmunir.workers.dev" -v new_url="$WORKER_URL" '{gsub(old_url, new_url); print}' public/index.html.bak > public/index.html
+sed "s|https://quran-api.asrulmunir.workers.dev|$WORKER_URL|g" public/index.html.backup > public/index.html
 
-# Deploy Pages
+# Deploy Pages (simplified approach)
 echo ""
 echo -e "${BLUE}🌐 Deploying test interface to Cloudflare Pages...${NC}"
 echo -e "${YELLOW}Note: This may take a few moments...${NC}"
 
-# Simple deployment without output capture to avoid script termination
+# Deploy without capturing output to avoid script termination
 if wrangler pages deploy public --project-name="$PAGES_NAME" --commit-dirty=true; then
     echo -e "${GREEN}✅ Pages deployed successfully!${NC}"
-    # Use standard URL format since we can't reliably extract the hash
     PAGES_URL="https://$PAGES_NAME.pages.dev"
-    ALIAS_URL="https://main.$PAGES_NAME.pages.dev"
     echo -e "${YELLOW}📝 Note: The actual URL may have a hash prefix. Check Cloudflare Dashboard for exact URL.${NC}"
 else
     echo -e "${RED}❌ Pages deployment failed${NC}"
     echo -e "${YELLOW}⚠️  You can deploy manually later with: wrangler pages deploy public --project-name=$PAGES_NAME${NC}"
     PAGES_URL="https://$PAGES_NAME.pages.dev (manual deployment needed)"
-    ALIAS_URL=""
 fi
 
 echo ""
@@ -153,9 +127,7 @@ echo -e "   ${BLUE}$WORKER_URL${NC}"
 echo ""
 echo -e "${GREEN}🌐 Test Interface:${NC}"
 echo -e "   ${BLUE}$PAGES_URL${NC}"
-if [ -n "$ALIAS_URL" ]; then
-    echo -e "   ${BLUE}Alias: $ALIAS_URL${NC}"
-fi
+echo -e "   ${BLUE}Alias: https://main.$PAGES_NAME.pages.dev${NC}"
 echo ""
 echo -e "${GREEN}📊 API Endpoints:${NC}"
 echo -e "   ${BLUE}$WORKER_URL/api/info${NC}"
@@ -165,7 +137,7 @@ echo ""
 
 # Test the API
 echo -e "${BLUE}🧪 Testing your API...${NC}"
-if curl -s "$WORKER_URL/api/info" > /dev/null; then
+if curl -s "$WORKER_URL/api/info" > /dev/null 2>&1; then
     echo -e "${GREEN}✅ API is working correctly!${NC}"
 else
     echo -e "${YELLOW}⚠️  API might still be propagating. Try again in a few minutes.${NC}"
@@ -184,9 +156,15 @@ echo ""
 echo -e "${GREEN}Barakallahu feekum! 🤲${NC}"
 
 # Restore original files
-if [ -f "wrangler.toml.bak" ]; then
-    mv wrangler.toml.bak wrangler.toml
+echo ""
+echo -e "${BLUE}🔄 Restoring original configuration files...${NC}"
+if [ -f "wrangler.toml.backup" ]; then
+    mv wrangler.toml.backup wrangler.toml
+    echo -e "${GREEN}✅ wrangler.toml restored${NC}"
 fi
-if [ -f "public/index.html.bak" ]; then
-    mv public/index.html.bak public/index.html
+if [ -f "public/index.html.backup" ]; then
+    mv public/index.html.backup public/index.html
+    echo -e "${GREEN}✅ index.html restored${NC}"
 fi
+
+echo -e "${GREEN}✅ Deployment script completed successfully!${NC}"
