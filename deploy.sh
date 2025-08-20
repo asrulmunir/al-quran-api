@@ -81,21 +81,17 @@ echo ""
 echo -e "${BLUE}🚀 Deploying API to Cloudflare Workers...${NC}"
 wrangler deploy
 
-# Get the deployed URL
-WORKER_URL=$(wrangler deployments list --name="$API_NAME" --format=json 2>/dev/null | head -1 | grep -o 'https://[^"]*' || echo "")
-
-if [ -z "$WORKER_URL" ]; then
-    # Fallback URL construction
-    ACCOUNT_ID=$(wrangler whoami | grep "Account ID" | awk '{print $NF}')
-    WORKER_URL="https://$API_NAME.$(wrangler whoami | grep -o '[^@]*@[^.]*' | cut -d'@' -f2).workers.dev"
-fi
+# Get the deployed URL - construct it directly from the API name
+WORKER_URL="https://$API_NAME.asrulmunir.workers.dev"
 
 echo -e "${GREEN}✅ API deployed successfully!${NC}"
 echo -e "${GREEN}   API URL: $WORKER_URL${NC}"
 
 # Update the test interface to use the new API URL
 echo -e "${BLUE}📝 Updating test interface...${NC}"
-sed -i.bak "s|https://quran-api.asrulmunir.workers.dev|$WORKER_URL|g" public/index.html
+# Create backup and use awk for more reliable replacement
+cp public/index.html public/index.html.bak
+awk -v old_url="https://quran-api.asrulmunir.workers.dev" -v new_url="$WORKER_URL" '{gsub(old_url, new_url); print}' public/index.html.bak > public/index.html
 
 # Deploy Pages
 echo ""
@@ -142,5 +138,9 @@ echo ""
 echo -e "${GREEN}Barakallahu feekum! 🤲${NC}"
 
 # Restore original files
-mv wrangler.toml.bak wrangler.toml 2>/dev/null || true
-mv public/index.html.bak public/index.html 2>/dev/null || true
+if [ -f "wrangler.toml.bak" ]; then
+    mv wrangler.toml.bak wrangler.toml
+fi
+if [ -f "public/index.html.bak" ]; then
+    mv public/index.html.bak public/index.html
+fi
