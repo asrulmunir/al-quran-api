@@ -22,7 +22,15 @@
 # Clone and deploy your own instance
 git clone https://github.com/asrulmunir/al-quran-api.git
 cd al-quran-api
+
+# Option 1: Standard deployment
 ./deploy.sh
+
+# Option 2: If you encounter issues, use the stable version
+./deploy-stable.sh
+
+# Option 3: Simple deployment without advanced features
+./deploy-simple.sh
 ```
 
 ### **Windows (PowerShell)**
