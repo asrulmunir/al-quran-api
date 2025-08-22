@@ -13,9 +13,17 @@ cd al-quran-api
 
 **That's it!** Your Quran API will be live in minutes. 🎉
 
-## 🌐 Live Demo API
+## 🌐 Live Demo
 
+### **🔧 API Service (Cloudflare Workers)**
 **https://quran-api.asrulmunir.workers.dev**
+
+### **🌐 Live Demo UI (Sample Implementation)**
+**https://al-quran-ui.asrulmunir.workers.dev**
+
+**GitHub Repository**: https://github.com/asrulmunir/al-quran-ui
+
+*See the API in action with a beautiful, responsive interface showcasing all features including multilingual search and translations.*
 
 ## 📊 Features
 
@@ -41,6 +49,7 @@ cd al-quran-api
 - Quran study websites
 - Research projects
 - Educational platforms
+- **See live example**: [al-quran-ui.asrulmunir.workers.dev](https://al-quran-ui.asrulmunir.workers.dev)
 
 ### 📚 **Students & Researchers**
 - Academic research
@@ -84,6 +93,27 @@ This endpoint provides:
 - 🔧 **Automated tools** that need to understand the API structure
 - 📚 **Documentation generators** and API explorers
 - 🎯 **Integration planning** and development guidance
+
+## 🎨 Live Demo UI
+
+### **Sample Implementation**
+**🌐 Live Demo**: https://al-quran-ui.asrulmunir.workers.dev  
+**📂 Source Code**: https://github.com/asrulmunir/al-quran-ui
+
+**Features Demonstrated:**
+- ✅ **Multilingual Interface** - English, Malay, Chinese, Tamil support
+- ✅ **Advanced Search** - Arabic text search with normalization
+- ✅ **Reverse Search** - Find verses by meaning in any supported language
+- ✅ **Translation Comparison** - Side-by-side view of all translations
+- ✅ **Responsive Design** - Works perfectly on mobile and desktop
+- ✅ **Beautiful Typography** - Proper Arabic font rendering
+- ✅ **Fast Performance** - Powered by Cloudflare Workers
+
+**Perfect Reference for:**
+- 👨‍💻 **Developers** building similar applications
+- 🎨 **UI/UX designers** creating Islamic interfaces
+- 🏢 **Organizations** planning Quran-based projects
+- 📱 **Mobile app developers** needing inspiration
 
 ## 🔍 Search Parameters
 
