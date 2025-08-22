@@ -840,7 +840,7 @@ export default {
       // GET /api/LLM - LLM-friendly comprehensive API guide
       if (path === '/api/LLM') {
         const llmGuide = {
-          "api_name": "JQuranTree API",
+          "api_name": "Al-Quran API",
           "description": "Complete RESTful API for accessing the Holy Quran with Arabic text, English and Malay translations, and advanced search capabilities",
           "base_url": "https://quran-api.asrulmunir.workers.dev",
           "version": "1.0.0",

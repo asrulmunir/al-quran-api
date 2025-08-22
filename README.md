@@ -1,4 +1,4 @@
-# 🕌 JQuranTree API - Deploy Your Own Quran API
+# 🕌 Al-Quran API - Deploy Your Own Quran API
 
 **Deploy a complete Quran API in under 5 minutes!** A modern RESTful API for accessing and analyzing the Holy Quran, designed for easy deployment on Cloudflare Workers.
 
