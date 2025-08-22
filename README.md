@@ -82,6 +82,8 @@ deploy.bat
 ## 📊 Features
 
 - **Complete Quran Access**: All 114 chapters, 6,236 verses, 77,430+ words
+- **Multi-Language Support**: English (Hilali-Khan) and Malay (Basmeih) translations
+- **Translation Comparison**: Side-by-side Arabic and translation comparison
 - **Advanced Arabic Search**: Unicode normalization and text processing
 - **RESTful API**: JSON responses with CORS enabled
 - **Global Performance**: Cloudflare edge deployment
@@ -111,6 +113,7 @@ deploy.bat
 
 ## 🚀 API Endpoints
 
+### **📖 Arabic Text**
 | Endpoint | Description | Example |
 |----------|-------------|---------|
 | `GET /api/info` | Basic Quran statistics | [/api/info](https://quran-api.asrulmunir.workers.dev/api/info) |
@@ -119,6 +122,20 @@ deploy.bat
 | `GET /api/verses/{ch}/{v}` | Get specific verse | [/api/verses/2/255](https://quran-api.asrulmunir.workers.dev/api/verses/2/255) |
 | `GET /api/search` | Search text | [/api/search?q=الله&normalize=true](https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=5) |
 | `GET /api/stats` | Statistics | [/api/stats](https://quran-api.asrulmunir.workers.dev/api/stats) |
+
+### **🌍 Translations**
+| Endpoint | Description | Example |
+|----------|-------------|---------|
+| `GET /api/translations` | List available translations | [/api/translations](https://quran-api.asrulmunir.workers.dev/api/translations) |
+| `GET /api/translations/{key}` | Get translation info | [/api/translations/en.hilali](https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali) |
+| `GET /api/translations/{key}/chapters` | List translated chapters | [/api/translations/en.hilali/chapters](https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali/chapters) |
+| `GET /api/translations/{key}/chapters/{id}` | Get translated chapter | [/api/translations/ms.basmeih/chapters/1](https://quran-api.asrulmunir.workers.dev/api/translations/ms.basmeih/chapters/1) |
+| `GET /api/translations/{key}/verses/{ch}/{v}` | Get translated verse | [/api/translations/en.hilali/verses/2/255](https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali/verses/2/255) |
+| `GET /api/compare/{ch}/{v}` | Compare Arabic with translations | [/api/compare/1/1](https://quran-api.asrulmunir.workers.dev/api/compare/1/1) |
+
+### **🌐 Available Translations**
+- **`en.hilali`**: English - Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan
+- **`ms.basmeih`**: Bahasa Melayu - Abdullah Muhammad Basmeih (JAKIM)
 
 ## 🔍 Search Parameters
 
@@ -129,30 +146,53 @@ deploy.bat
 
 ## 💻 Usage Examples
 
-### JavaScript/Fetch
+### **JavaScript/Fetch**
 ```javascript
 // Replace with your deployed API URL
 const API_BASE = 'https://your-api-name.your-account.workers.dev/api';
 
-// Search for Allah
+// Search for Allah in Arabic
 fetch(`${API_BASE}/search?q=الله&normalize=true&limit=10`)
   .then(r => r.json())
   .then(data => console.log(`Found ${data.resultCount} verses`));
 
-// Get Al-Fatiha
+// Get Al-Fatiha in Arabic
 fetch(`${API_BASE}/chapters/1`)
   .then(r => r.json())
   .then(chapter => console.log(chapter.verses));
+
+// Get English translation of Al-Fatiha
+fetch(`${API_BASE}/translations/en.hilali/chapters/1`)
+  .then(r => r.json())
+  .then(chapter => console.log(chapter.verses));
+
+// Compare Ayat al-Kursi in all languages
+fetch(`${API_BASE}/compare/2/255`)
+  .then(r => r.json())
+  .then(data => {
+    console.log('Arabic:', data.arabic.text);
+    console.log('English:', data.translations['en.hilali'].text);
+    console.log('Malay:', data.translations['ms.basmeih'].text);
+  });
 ```
 
-### cURL
+### **cURL**
 ```bash
 # Replace with your API URL
 curl "https://your-api-name.your-account.workers.dev/api/info"
 curl "https://your-api-name.your-account.workers.dev/api/search?q=الله&limit=5"
+
+# Get available translations
+curl "https://your-api-name.your-account.workers.dev/api/translations"
+
+# Get English translation of a verse
+curl "https://your-api-name.your-account.workers.dev/api/translations/en.hilali/verses/1/1"
+
+# Compare translations
+curl "https://your-api-name.your-account.workers.dev/api/compare/1/1"
 ```
 
-### Python
+### **Python**
 ```python
 import requests
 
@@ -167,6 +207,17 @@ response = requests.get(f"{API_BASE}/search", params={
 })
 data = response.json()
 print(f"Found {data['resultCount']} verses")
+
+# Get translations
+translations = requests.get(f"{API_BASE}/translations").json()
+for trans in translations:
+    print(f"{trans['language_name']}: {trans['translator']}")
+
+# Compare verse in multiple languages
+comparison = requests.get(f"{API_BASE}/compare/2/255").json()
+print("Arabic:", comparison['arabic']['text'])
+for key, trans in comparison['translations'].items():
+    print(f"{trans['language_name']}:", trans['text'])
 ```
 
 ## 📁 Project Structure

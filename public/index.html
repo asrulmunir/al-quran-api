@@ -448,12 +448,22 @@
                 <h3 data-en="🌐 CORS Enabled" data-ms="🌐 CORS Diaktifkan">🌐 CORS Enabled</h3>
                 <p data-en="Ready for web applications with proper CORS headers and JSON responses." data-ms="Sedia untuk aplikasi web dengan header CORS yang betul dan respons JSON.">Ready for web applications with proper CORS headers and JSON responses.</p>
             </div>
+            <div class="feature-card">
+                <h3 data-en="🌍 Multi-Language" data-ms="🌍 Pelbagai Bahasa">🌍 Multi-Language</h3>
+                <p data-en="Includes English (Hilali-Khan) and Malay (Basmeih) translations with comparison endpoints." data-ms="Termasuk terjemahan Bahasa Inggeris (Hilali-Khan) dan Bahasa Melayu (Basmeih) dengan titik akhir perbandingan.">Includes English (Hilali-Khan) and Malay (Basmeih) translations with comparison endpoints.</p>
+            </div>
+            <div class="feature-card">
+                <h3 data-en="🔄 Compare Translations" data-ms="🔄 Bandingkan Terjemahan">🔄 Compare Translations</h3>
+                <p data-en="Side-by-side comparison of Arabic text with multiple translations for better understanding." data-ms="Perbandingan sebelah-menyebelah teks Arab dengan pelbagai terjemahan untuk pemahaman yang lebih baik.">Side-by-side comparison of Arabic text with multiple translations for better understanding.</p>
+            </div>
         </div>
     </div>
 
     <div class="container">
         <h2 data-en="🔗 API Endpoints" data-ms="🔗 Titik Akhir API">🔗 API Endpoints</h2>
         <p data-en="Direct links to test the API endpoints:" data-ms="Pautan langsung untuk menguji titik akhir API:">Direct links to test the API endpoints:</p>
+        
+        <h3 data-en="📖 Arabic Text" data-ms="📖 Teks Arab">📖 Arabic Text</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin: 20px 0;">
             <a href="https://quran-api.asrulmunir.workers.dev/api/info" target="_blank" class="api-link">GET /api/info</a>
             <a href="https://quran-api.asrulmunir.workers.dev/api/chapters" target="_blank" class="api-link">GET /api/chapters</a>
@@ -461,6 +471,17 @@
             <a href="https://quran-api.asrulmunir.workers.dev/api/verses/2/255" target="_blank" class="api-link">GET /api/verses/2/255</a>
             <a href="https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=5" target="_blank" class="api-link">GET /api/search</a>
             <a href="https://quran-api.asrulmunir.workers.dev/api/stats" target="_blank" class="api-link">GET /api/stats</a>
+        </div>
+
+        <h3 data-en="🌍 Translations" data-ms="🌍 Terjemahan">🌍 Translations</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin: 20px 0;">
+            <a href="https://quran-api.asrulmunir.workers.dev/api/translations" target="_blank" class="api-link">GET /api/translations</a>
+            <a href="https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali" target="_blank" class="api-link">GET /api/translations/en.hilali</a>
+            <a href="https://quran-api.asrulmunir.workers.dev/api/translations/ms.basmeih" target="_blank" class="api-link">GET /api/translations/ms.basmeih</a>
+            <a href="https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali/chapters" target="_blank" class="api-link">GET /translations/en.hilali/chapters</a>
+            <a href="https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali/chapters/1" target="_blank" class="api-link">GET /translations/en.hilali/chapters/1</a>
+            <a href="https://quran-api.asrulmunir.workers.dev/api/translations/ms.basmeih/verses/2/255" target="_blank" class="api-link">GET /translations/ms.basmeih/verses/2/255</a>
+            <a href="https://quran-api.asrulmunir.workers.dev/api/compare/1/1" target="_blank" class="api-link">GET /api/compare/1/1</a>
         </div>
     </div>
 

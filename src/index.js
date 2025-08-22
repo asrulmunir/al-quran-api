@@ -1,5 +1,13 @@
 // JQuranTree API for Cloudflare Workers
 import quranData from './quran-data.json';
+import enHilali from './translations/en.hilali.json';
+import msBasmeih from './translations/ms.basmeih.json';
+
+// Available translations
+const translations = {
+  'en.hilali': enHilali,
+  'ms.basmeih': msBasmeih
+};
 
 // Unicode normalization utilities for Arabic text
 class ArabicTextUtils {
@@ -309,7 +317,219 @@ export default {
           license: "Creative Commons Attribution-NoDerivs 3.0 Unported (CC BY-ND 3.0)",
           licenseUrl: "https://creativecommons.org/licenses/by-nd/3.0/",
           attribution: "Quran text courtesy of Tanzil.net",
-          features: ["search", "unicode", "arabic-normalization"]
+          features: ["search", "unicode", "arabic-normalization", "translations"],
+          availableTranslations: Object.keys(translations).map(key => ({
+            key: key,
+            name: translations[key].name,
+            translator: translations[key].translator,
+            language: translations[key].language,
+            language_name: translations[key].language_name
+          }))
+        }), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
+
+      // GET /api/translations - List available translations
+      if (path === '/api/translations') {
+        const translationList = Object.keys(translations).map(key => ({
+          key: key,
+          name: translations[key].name,
+          translator: translations[key].translator,
+          language: translations[key].language,
+          language_name: translations[key].language_name,
+          source: translations[key].source
+        }));
+        
+        return addCorsHeaders(new Response(JSON.stringify(translationList), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
+
+      // GET /api/translations/{translation_key} - Get translation info
+      const translationInfoMatch = path.match(/^\/api\/translations\/([^\/]+)$/);
+      if (translationInfoMatch) {
+        const translationKey = translationInfoMatch[1];
+        const translation = translations[translationKey];
+        
+        if (!translation) {
+          return addCorsHeaders(new Response(JSON.stringify({ 
+            error: 'Translation not found',
+            available: Object.keys(translations)
+          }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        return addCorsHeaders(new Response(JSON.stringify({
+          key: translationKey,
+          name: translation.name,
+          translator: translation.translator,
+          language: translation.language,
+          language_name: translation.language_name,
+          source: translation.source,
+          chapterCount: translation.chapters.length
+        }), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
+
+      // GET /api/translations/{translation_key}/chapters - Get translated chapters list
+      const translationChaptersMatch = path.match(/^\/api\/translations\/([^\/]+)\/chapters$/);
+      if (translationChaptersMatch) {
+        const translationKey = translationChaptersMatch[1];
+        const translation = translations[translationKey];
+        
+        if (!translation) {
+          return addCorsHeaders(new Response(JSON.stringify({ 
+            error: 'Translation not found',
+            available: Object.keys(translations)
+          }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        const chapters = translation.chapters.map(ch => ({
+          number: ch.number,
+          name: ch.name,
+          name_arabic: ch.name_arabic,
+          name_translation: ch.name_translation,
+          verseCount: ch.verses.length
+        }));
+        
+        return addCorsHeaders(new Response(JSON.stringify(chapters), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
+
+      // GET /api/translations/{translation_key}/chapters/{id} - Get translated chapter
+      const translationChapterMatch = path.match(/^\/api\/translations\/([^\/]+)\/chapters\/(\d+)$/);
+      if (translationChapterMatch) {
+        const translationKey = translationChapterMatch[1];
+        const chapterNum = parseInt(translationChapterMatch[2]);
+        const translation = translations[translationKey];
+        
+        if (!translation) {
+          return addCorsHeaders(new Response(JSON.stringify({ 
+            error: 'Translation not found',
+            available: Object.keys(translations)
+          }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        const chapter = translation.chapters.find(ch => ch.number === chapterNum);
+        if (!chapter) {
+          return addCorsHeaders(new Response(JSON.stringify({ error: 'Chapter not found' }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        return addCorsHeaders(new Response(JSON.stringify({
+          translation: translationKey,
+          number: chapter.number,
+          name: chapter.name,
+          name_arabic: chapter.name_arabic,
+          name_translation: chapter.name_translation,
+          verseCount: chapter.verses.length,
+          verses: chapter.verses
+        }), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
+
+      // GET /api/translations/{translation_key}/verses/{chapterNum}/{verseNum} - Get translated verse
+      const translationVerseMatch = path.match(/^\/api\/translations\/([^\/]+)\/verses\/(\d+)\/(\d+)$/);
+      if (translationVerseMatch) {
+        const translationKey = translationVerseMatch[1];
+        const chapterNum = parseInt(translationVerseMatch[2]);
+        const verseNum = parseInt(translationVerseMatch[3]);
+        const translation = translations[translationKey];
+        
+        if (!translation) {
+          return addCorsHeaders(new Response(JSON.stringify({ 
+            error: 'Translation not found',
+            available: Object.keys(translations)
+          }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        const chapter = translation.chapters.find(ch => ch.number === chapterNum);
+        if (!chapter) {
+          return addCorsHeaders(new Response(JSON.stringify({ error: 'Chapter not found' }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        const verse = chapter.verses.find(v => v.number === verseNum);
+        if (!verse) {
+          return addCorsHeaders(new Response(JSON.stringify({ error: 'Verse not found' }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        return addCorsHeaders(new Response(JSON.stringify({
+          translation: translationKey,
+          chapterNumber: chapterNum,
+          verseNumber: verseNum,
+          text: verse.text,
+          chapterName: chapter.name,
+          chapterNameArabic: chapter.name_arabic,
+          chapterNameTranslation: chapter.name_translation
+        }), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
+
+      // GET /api/compare/{chapterNum}/{verseNum} - Compare Arabic with translations
+      const compareMatch = path.match(/^\/api\/compare\/(\d+)\/(\d+)$/);
+      if (compareMatch) {
+        const chapterNum = parseInt(compareMatch[1]);
+        const verseNum = parseInt(compareMatch[2]);
+        
+        // Get Arabic verse
+        const arabicVerse = Document.getVerse(chapterNum, verseNum);
+        if (!arabicVerse) {
+          return addCorsHeaders(new Response(JSON.stringify({ error: 'Verse not found' }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+        
+        // Get translations
+        const translatedVerses = {};
+        Object.keys(translations).forEach(key => {
+          const translation = translations[key];
+          const chapter = translation.chapters.find(ch => ch.number === chapterNum);
+          if (chapter) {
+            const verse = chapter.verses.find(v => v.number === verseNum);
+            if (verse) {
+              translatedVerses[key] = {
+                text: verse.text,
+                translator: translation.translator,
+                language: translation.language,
+                language_name: translation.language_name
+              };
+            }
+          }
+        });
+        
+        return addCorsHeaders(new Response(JSON.stringify({
+          chapterNumber: chapterNum,
+          verseNumber: verseNum,
+          arabic: {
+            text: arabicVerse.getText(),
+            source: "Tanzil.net Uthmani"
+          },
+          translations: translatedVerses
         }), {
           headers: { 'Content-Type': 'application/json' }
         }));

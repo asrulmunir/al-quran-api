@@ -1,0 +1,65 @@
+{
+  "name": "Al-Quran - Terjemahan Bahasa Melayu",
+  "translator": "Abdullah Muhammad Basmeih",
+  "language": "ms",
+  "language_name": "Bahasa Melayu",
+  "source": "Jabatan Kemajuan Islam Malaysia (JAKIM)",
+  "chapters": [
+    {
+      "number": 1,
+      "name": "Al-Fatihah",
+      "name_arabic": "الفاتحة",
+      "name_translation": "Pembukaan",
+      "verses": [
+        {
+          "number": 1,
+          "text": "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani."
+        },
+        {
+          "number": 2,
+          "text": "Segala puji tertentu bagi Allah, Tuhan yang memelihara dan mentadbirkan sekalian alam."
+        },
+        {
+          "number": 3,
+          "text": "Yang Maha Pemurah, lagi Maha Mengasihani."
+        },
+        {
+          "number": 4,
+          "text": "Yang menguasai pemerintahan hari Pembalasan (hari Akhirat)."
+        },
+        {
+          "number": 5,
+          "text": "Engkaulah sahaja yang kami sembah, dan kepada Engkaulah sahaja kami memohon pertolongan."
+        },
+        {
+          "number": 6,
+          "text": "Tunjukilah kami jalan yang lurus."
+        },
+        {
+          "number": 7,
+          "text": "Iaitu jalan orang-orang yang Engkau telah kurniakan nikmat kepada mereka; bukan (jalan) mereka yang dimurkai, dan bukan pula (jalan) mereka yang sesat."
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Al-Baqarah",
+      "name_arabic": "البقرة",
+      "name_translation": "Lembu Betina",
+      "verses": [
+        {
+          "number": 1,
+          "text": "Alif Laam Miim."
+        },
+        {
+          "number": 2,
+          "text": "Kitab Al-Quran ini, tidak ada sebarang syak padanya (tentang datangnya dari Allah dan tentang petunjuk-petunjuknya); ia menjadi petunjuk bagi orang-orang yang (hendak) bertaqwa;"
+        },
+        {
+          "number": 3,
+          "text": "(Iaitu) mereka yang beriman kepada perkara-perkara yang ghaib, dan mendirikan sembahyang serta membelanjakan (pada jalan Allah) dari apa yang Kami rezekikan kepada mereka."
+        }
+      ]
+    }
+  ]
+}
