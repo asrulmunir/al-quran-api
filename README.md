@@ -57,7 +57,8 @@ cd al-quran-api
 | `GET /api/verses/{ch}/{v}` | Get specific verse | [/api/verses/2/255](https://quran-api.asrulmunir.workers.dev/api/verses/2/255) |
 | `GET /api/compare/{ch}/{v}` | Compare Arabic with translations | [/api/compare/1/1](https://quran-api.asrulmunir.workers.dev/api/compare/1/1) |
 | `GET /api/translations` | List available translations | [/api/translations](https://quran-api.asrulmunir.workers.dev/api/translations) |
-| `GET /api/search` | Search text | [/api/search?q=الله&normalize=true](https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=5) |
+| `GET /api/search` | Search Arabic text | [/api/search?q=الله&normalize=true](https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=5) |
+| `GET /api/search/translation` | **🔍 Reverse search in translations** | [/api/search/translation?q=mercy&lang=en](https://quran-api.asrulmunir.workers.dev/api/search/translation?q=mercy&lang=en&limit=5) |
 | `GET /api/stats` | Statistics | [/api/stats](https://quran-api.asrulmunir.workers.dev/api/stats) |
 | `GET /api/LLM` | **LLM-friendly comprehensive guide** | [/api/LLM](https://quran-api.asrulmunir.workers.dev/api/LLM) |
 
@@ -85,10 +86,39 @@ This endpoint provides:
 
 ## 🔍 Search Parameters
 
+### **Arabic Text Search (`/api/search`)**
 - **`q`**: Search query (required)
 - **`type`**: `exact` or `substring` (default: substring)
 - **`normalize`**: `true`/`false` - Arabic text normalization
 - **`limit`**: Maximum results (default: 50)
+
+### **🔄 Reverse Search in Translations (`/api/search/translation`)**
+Find verses by searching in English or Malay translations - perfect for non-Arabic speakers!
+
+- **`q`**: Search query in English or Malay (required)
+- **`lang`**: Language - `en` for English, `ms` for Malay (default: en)
+- **`type`**: `exact` or `substring` (default: substring)
+- **`limit`**: Maximum results (default: 50)
+- **`include_arabic`**: Include Arabic text in results (default: true)
+
+#### **Examples:**
+```bash
+# Find verses about mercy in English
+/api/search/translation?q=mercy&lang=en
+
+# Find verses about love in Malay
+/api/search/translation?q=kasih&lang=ms
+
+# Exact word search for "forgiveness"
+/api/search/translation?q=forgiveness&lang=en&type=exact
+
+# Search without Arabic text in results
+/api/search/translation?q=guidance&lang=en&include_arabic=false
+```
+
+#### **Popular Search Terms:**
+- **English**: mercy, forgiveness, guidance, paradise, prayer, faith, charity, patience
+- **Malay**: kasih, ampun, petunjuk, syurga, solat, iman, sedekah, sabar
 
 ## 💻 Usage Examples
 
@@ -97,10 +127,20 @@ This endpoint provides:
 // Replace with your deployed API URL
 const API_BASE = 'https://your-api-name.your-account.workers.dev/api';
 
-// Search for Allah
+// Search for Allah in Arabic
 fetch(`${API_BASE}/search?q=الله&normalize=true&limit=10`)
   .then(r => r.json())
   .then(data => console.log(`Found ${data.resultCount} verses`));
+
+// Reverse search: Find verses about mercy in English
+fetch(`${API_BASE}/search/translation?q=mercy&lang=en&limit=10`)
+  .then(r => r.json())
+  .then(data => {
+    console.log(`Found ${data.resultCount} verses about mercy`);
+    data.results.forEach(result => {
+      console.log(`${result.chapterNumber}:${result.verseNumber} - ${result.translation.text}`);
+    });
+  });
 
 // Get Al-Fatiha
 fetch(`${API_BASE}/chapters/1`)
@@ -123,6 +163,10 @@ fetch(`${API_BASE}/compare/1/1`)
 curl "https://your-api-name.your-account.workers.dev/api/info"
 curl "https://your-api-name.your-account.workers.dev/api/search?q=الله&limit=5"
 curl "https://your-api-name.your-account.workers.dev/api/compare/2/255"
+
+# Reverse search examples
+curl "https://your-api-name.your-account.workers.dev/api/search/translation?q=mercy&lang=en&limit=5"
+curl "https://your-api-name.your-account.workers.dev/api/search/translation?q=kasih&lang=ms&limit=5"
 ```
 
 ### Python
@@ -132,7 +176,7 @@ import requests
 # Replace with your API URL
 API_BASE = "https://your-api-name.your-account.workers.dev/api"
 
-# Search verses
+# Search verses in Arabic
 response = requests.get(f"{API_BASE}/search", params={
     "q": "الله",
     "normalize": True,
@@ -140,6 +184,17 @@ response = requests.get(f"{API_BASE}/search", params={
 })
 data = response.json()
 print(f"Found {data['resultCount']} verses")
+
+# Reverse search: Find verses about forgiveness in English
+response = requests.get(f"{API_BASE}/search/translation", params={
+    "q": "forgiveness",
+    "lang": "en",
+    "limit": 10
+})
+data = response.json()
+print(f"Found {data['resultCount']} verses about forgiveness")
+for result in data['results']:
+    print(f"{result['chapterNumber']}:{result['verseNumber']} - {result['translation']['text']}")
 
 # Get verse with translations
 response = requests.get(f"{API_BASE}/compare/1/1")

@@ -640,6 +640,132 @@ export default {
           headers: { 'Content-Type': 'application/json' }
         }));
       }
+
+      // GET /api/search/translation - Search within translations (reverse search)
+      if (path === '/api/search/translation') {
+        const query = url.searchParams.get('q');
+        const lang = url.searchParams.get('lang') || 'en'; // 'en' or 'ms'
+        const type = url.searchParams.get('type') || 'substring'; // 'exact' or 'substring'
+        const limit = parseInt(url.searchParams.get('limit')) || 50;
+        const includeArabic = url.searchParams.get('include_arabic') !== 'false'; // default true
+        
+        if (!query) {
+          return addCorsHeaders(new Response(JSON.stringify({ 
+            error: 'Query parameter "q" is required',
+            usage: 'GET /api/search/translation?q=mercy&lang=en&type=substring&limit=20',
+            supportedLanguages: ['en', 'ms'],
+            examples: {
+              english: '/api/search/translation?q=forgiveness&lang=en',
+              malay: '/api/search/translation?q=kasih&lang=ms'
+            }
+          }), { 
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+
+        // Validate language
+        const supportedLangs = ['en', 'ms'];
+        if (!supportedLangs.includes(lang)) {
+          return addCorsHeaders(new Response(JSON.stringify({ 
+            error: `Unsupported language: ${lang}`,
+            supportedLanguages: supportedLangs
+          }), { 
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+
+        // Get the appropriate translation key
+        const translationKey = lang === 'en' ? 'en.hilali' : 'ms.basmeih';
+        const translation = translations[translationKey];
+        
+        if (!translation) {
+          return addCorsHeaders(new Response(JSON.stringify({ 
+            error: `Translation not available for language: ${lang}`,
+            available: Object.keys(translations)
+          }), { 
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+
+        // Perform search in translation text
+        const searchResults = [];
+        const queryLower = query.toLowerCase();
+        
+        translation.chapters.forEach(chapter => {
+          chapter.verses.forEach(verse => {
+            const verseTextLower = verse.text.toLowerCase();
+            let matches = false;
+            
+            if (type === 'exact') {
+              // Split into words and check for exact word match
+              const words = verseTextLower.split(/\s+/);
+              matches = words.some(word => 
+                word.replace(/[.,;:!?()[\]{}'"]/g, '') === queryLower
+              );
+            } else {
+              // Substring search
+              matches = verseTextLower.includes(queryLower);
+            }
+            
+            if (matches) {
+              const result = {
+                chapterNumber: chapter.number,
+                verseNumber: verse.number,
+                chapterName: chapter.name,
+                chapterNameArabic: chapter.name_arabic,
+                translation: {
+                  text: verse.text,
+                  language: lang,
+                  languageName: translation.language_name,
+                  translator: translation.translator
+                }
+              };
+
+              // Include Arabic text if requested
+              if (includeArabic) {
+                const arabicVerse = Document.getVerse(chapter.number, verse.number);
+                if (arabicVerse) {
+                  result.arabic = {
+                    text: arabicVerse.getText(),
+                    source: "Tanzil.net Uthmani"
+                  };
+                }
+              }
+
+              searchResults.push(result);
+            }
+          });
+        });
+
+        // Sort by chapter and verse number
+        searchResults.sort((a, b) => {
+          if (a.chapterNumber !== b.chapterNumber) {
+            return a.chapterNumber - b.chapterNumber;
+          }
+          return a.verseNumber - b.verseNumber;
+        });
+
+        return addCorsHeaders(new Response(JSON.stringify({
+          query,
+          language: lang,
+          languageName: translation.language_name,
+          translator: translation.translator,
+          searchType: type,
+          includeArabic,
+          resultCount: searchResults.length,
+          results: searchResults.slice(0, limit),
+          hasMore: searchResults.length > limit,
+          searchInfo: {
+            totalVerses: translation.chapters.reduce((sum, ch) => sum + ch.verses.length, 0),
+            searchedIn: `${translation.name} by ${translation.translator}`
+          }
+        }), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
       
       // GET /api/stats - Statistics endpoint
       if (path === '/api/stats') {
@@ -859,6 +985,35 @@ export default {
               "use_cases": ["Verse lookup", "Thematic research", "Word frequency analysis", "Content discovery"]
             },
 
+            "search_translations": {
+              "endpoint": "GET /api/search/translation",
+              "description": "Reverse search - find verses by searching within English or Malay translations",
+              "required_parameters": {
+                "q": "Search query in English or Malay"
+              },
+              "optional_parameters": {
+                "lang": "Language: 'en' for English, 'ms' for Malay (default: en)",
+                "type": "Search type: 'exact' or 'substring' (default: substring)",
+                "limit": "Maximum results to return (default: 50)",
+                "include_arabic": "Include Arabic text in results: true/false (default: true)"
+              },
+              "example_urls": [
+                "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=mercy&lang=en",
+                "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=kasih&lang=ms",
+                "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=forgiveness&lang=en&type=exact&limit=10"
+              ],
+              "response_fields": ["query", "language", "languageName", "translator", "searchType", "includeArabic", "resultCount", "results", "hasMore", "searchInfo"],
+              "supported_languages": {
+                "en": "English (Hilali-Khan translation)",
+                "ms": "Bahasa Melayu (Basmeih translation)"
+              },
+              "search_examples": {
+                "english_terms": ["mercy", "forgiveness", "guidance", "paradise", "prayer", "faith", "charity", "patience"],
+                "malay_terms": ["kasih", "ampun", "petunjuk", "syurga", "solat", "iman", "sedekah", "sabar"]
+              },
+              "use_cases": ["Find verses by meaning", "Thematic studies in native language", "Educational content", "Concept-based research", "Non-Arabic speaker assistance"]
+            },
+
             "list_translations": {
               "endpoint": "GET /api/translations",
               "description": "Get list of all available translations",
@@ -947,25 +1102,37 @@ export default {
             "when_to_use": [
               "User asks about Quran verses, chapters, or translations",
               "User wants to search for specific Arabic terms in the Quran",
+              "User wants to find verses by meaning in English or Malay",
               "User needs Islamic content for applications or research",
               "User wants to compare different translations of verses",
-              "User asks for Quranic statistics or information"
+              "User asks for Quranic statistics or information",
+              "User searches for concepts like 'mercy', 'forgiveness', 'guidance' in their language"
             ],
             "how_to_help": [
               "Use /api/search to find verses containing specific Arabic terms",
+              "Use /api/search/translation to find verses by English or Malay meaning",
               "Use /api/compare to show verses in Arabic with English and Malay translations",
               "Use /api/chapters to list all chapters for navigation",
               "Use /api/verses for specific verse lookups",
               "Always provide both Arabic text and translations when available",
+              "For non-Arabic speakers, use translation search to find verses by concept",
               "Explain the context and significance of verses when appropriate",
               "Respect Islamic etiquette when handling Quranic content"
             ],
+            "search_strategies": {
+              "arabic_speakers": "Use /api/search with Arabic terms and normalization",
+              "english_speakers": "Use /api/search/translation with lang=en for concept-based search",
+              "malay_speakers": "Use /api/search/translation with lang=ms for concept-based search",
+              "researchers": "Combine both Arabic and translation search for comprehensive results",
+              "educators": "Use translation search to help students find verses by familiar concepts"
+            },
             "response_formatting": [
               "Display Arabic text in proper RTL format when possible",
               "Include translation attribution (Hilali-Khan for English, Basmeih for Malay)",
               "Provide chapter and verse references (e.g., Al-Fatihah 1:1)",
               "Format search results clearly with verse references",
-              "Include relevant context about chapters or verses"
+              "Include relevant context about chapters or verses",
+              "When using translation search, explain the original Arabic context"
             ]
           },
 
