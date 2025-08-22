@@ -1,103 +1,39 @@
-# 🕌 Al-Quran API - Deploy Your Own Quran API
+# 🕌 JQuranTree API - Deploy Your Own Quran API
 
 **Deploy a complete Quran API in under 5 minutes!** A modern RESTful API for accessing and analyzing the Holy Quran, designed for easy deployment on Cloudflare Workers.
 
-## 💻 Cross-Platform Compatibility
-
-✅ **Windows 10/11**: PowerShell, Command Prompt, or WSL  
-✅ **macOS**: Terminal with bash/zsh  
-✅ **Linux**: Any distribution with bash  
-✅ **Node.js**: Version 16+ required  
-✅ **Git**: Required for cloning  
-
-### **Windows-Specific Features**
-- **PowerShell Smart Script**: `deploy-windows-smart.ps1` with advanced error handling
-- **Batch Script**: `deploy.bat` with conflict detection
-- **Auto-generated Names**: Timestamp and username-based suggestions
-- **Input Validation**: Character and length restrictions
-- **Multiple Retries**: Up to 3 attempts with different names
-
-### **Prerequisites**
-- [Node.js](https://nodejs.org/) (v16 or higher)
-- [Git](https://git-scm.com/)
-- [Cloudflare Account](https://dash.cloudflare.com/sign-up) (free)
-
 ## 🚀 One-Click Deployment
 
-### **macOS/Linux**
 ```bash
 # Clone and deploy your own instance
-git clone https://github.com/asrulmunir/al-quran-api.git
-cd al-quran-api
-
-# Option 1: Smart deployment with conflict handling (recommended)
-./deploy-smart.sh
-
-# Option 2: Standard deployment
+git clone https://github.com/YOUR-USERNAME/jqurantree-api.git
+cd jqurantree-api
 ./deploy.sh
-
-# Option 3: macOS-optimized
-./deploy-macos.sh
-
-# Option 4: Maximum stability with error handling
-./deploy-stable.sh
-
-# Option 5: Simple deployment without advanced features
-./deploy-simple.sh
-```
-
-### **Windows (PowerShell)**
-```powershell
-# Clone and deploy your own instance
-git clone https://github.com/asrulmunir/al-quran-api.git
-cd al-quran-api
-
-# Option 1: Smart deployment with conflict handling (recommended)
-.\deploy-windows-smart.ps1
-
-# Option 2: Standard PowerShell deployment
-.\deploy.ps1
-```
-
-### **Windows (Command Prompt)**
-```cmd
-# Clone and deploy your own instance
-git clone https://github.com/asrulmunir/al-quran-api.git
-cd al-quran-api
-
-# Standard batch deployment (with conflict handling)
-deploy.bat
 ```
 
 **That's it!** Your Quran API will be live in minutes. 🎉
 
-## 🌐 Live Demo
+## 🌐 Live Demo API
 
-### 🔧 API Service (Cloudflare Workers)
 **https://quran-api.asrulmunir.workers.dev**
-
-### 🌐 Test Interface (Cloudflare Pages)
-**https://quran-api-test.pages.dev**
 
 ## 📊 Features
 
 - **Complete Quran Access**: All 114 chapters, 6,236 verses, 77,430+ words
-- **Multi-Language Support**: English (Hilali-Khan) and Malay (Basmeih) translations
-- **Translation Comparison**: Side-by-side Arabic and translation comparison
+- **Complete Translations**: English (Hilali-Khan) and Malay (Basmeih) from Tanzil.net
 - **Advanced Arabic Search**: Unicode normalization and text processing
 - **RESTful API**: JSON responses with CORS enabled
 - **Global Performance**: Cloudflare edge deployment
-- **Beautiful Interface**: Mobile-responsive with Arabic font rendering
 - **Free Hosting**: 100K requests/day on Cloudflare's free tier
 - **Easy Deployment**: One-click setup for anyone
 
 ## 🎯 Perfect For
 
 ### 🕌 **Masjids & Islamic Centers**
-- Embed in your website
 - Mobile apps for congregation
 - Study group resources
 - Khutbah preparation tools
+- Website integration
 
 ### 👨‍💻 **Developers**
 - Islamic mobile applications
@@ -113,29 +49,16 @@ deploy.bat
 
 ## 🚀 API Endpoints
 
-### **📖 Arabic Text**
 | Endpoint | Description | Example |
 |----------|-------------|---------|
 | `GET /api/info` | Basic Quran statistics | [/api/info](https://quran-api.asrulmunir.workers.dev/api/info) |
 | `GET /api/chapters` | List all chapters | [/api/chapters](https://quran-api.asrulmunir.workers.dev/api/chapters) |
 | `GET /api/chapters/{id}` | Get specific chapter | [/api/chapters/1](https://quran-api.asrulmunir.workers.dev/api/chapters/1) |
 | `GET /api/verses/{ch}/{v}` | Get specific verse | [/api/verses/2/255](https://quran-api.asrulmunir.workers.dev/api/verses/2/255) |
+| `GET /api/compare/{ch}/{v}` | Compare Arabic with translations | [/api/compare/1/1](https://quran-api.asrulmunir.workers.dev/api/compare/1/1) |
+| `GET /api/translations` | List available translations | [/api/translations](https://quran-api.asrulmunir.workers.dev/api/translations) |
 | `GET /api/search` | Search text | [/api/search?q=الله&normalize=true](https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=5) |
 | `GET /api/stats` | Statistics | [/api/stats](https://quran-api.asrulmunir.workers.dev/api/stats) |
-
-### **🌍 Translations**
-| Endpoint | Description | Example |
-|----------|-------------|---------|
-| `GET /api/translations` | List available translations | [/api/translations](https://quran-api.asrulmunir.workers.dev/api/translations) |
-| `GET /api/translations/{key}` | Get translation info | [/api/translations/en.hilali](https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali) |
-| `GET /api/translations/{key}/chapters` | List translated chapters | [/api/translations/en.hilali/chapters](https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali/chapters) |
-| `GET /api/translations/{key}/chapters/{id}` | Get translated chapter | [/api/translations/ms.basmeih/chapters/1](https://quran-api.asrulmunir.workers.dev/api/translations/ms.basmeih/chapters/1) |
-| `GET /api/translations/{key}/verses/{ch}/{v}` | Get translated verse | [/api/translations/en.hilali/verses/2/255](https://quran-api.asrulmunir.workers.dev/api/translations/en.hilali/verses/2/255) |
-| `GET /api/compare/{ch}/{v}` | Compare Arabic with translations | [/api/compare/1/1](https://quran-api.asrulmunir.workers.dev/api/compare/1/1) |
-
-### **🌐 Available Translations**
-- **`en.hilali`**: English - Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan
-- **`ms.basmeih`**: Bahasa Melayu - Abdullah Muhammad Basmeih (JAKIM)
 
 ## 🔍 Search Parameters
 
@@ -146,28 +69,23 @@ deploy.bat
 
 ## 💻 Usage Examples
 
-### **JavaScript/Fetch**
+### JavaScript/Fetch
 ```javascript
 // Replace with your deployed API URL
 const API_BASE = 'https://your-api-name.your-account.workers.dev/api';
 
-// Search for Allah in Arabic
+// Search for Allah
 fetch(`${API_BASE}/search?q=الله&normalize=true&limit=10`)
   .then(r => r.json())
   .then(data => console.log(`Found ${data.resultCount} verses`));
 
-// Get Al-Fatiha in Arabic
+// Get Al-Fatiha
 fetch(`${API_BASE}/chapters/1`)
   .then(r => r.json())
   .then(chapter => console.log(chapter.verses));
 
-// Get English translation of Al-Fatiha
-fetch(`${API_BASE}/translations/en.hilali/chapters/1`)
-  .then(r => r.json())
-  .then(chapter => console.log(chapter.verses));
-
-// Compare Ayat al-Kursi in all languages
-fetch(`${API_BASE}/compare/2/255`)
+// Compare translations
+fetch(`${API_BASE}/compare/1/1`)
   .then(r => r.json())
   .then(data => {
     console.log('Arabic:', data.arabic.text);
@@ -176,23 +94,15 @@ fetch(`${API_BASE}/compare/2/255`)
   });
 ```
 
-### **cURL**
+### cURL
 ```bash
 # Replace with your API URL
 curl "https://your-api-name.your-account.workers.dev/api/info"
 curl "https://your-api-name.your-account.workers.dev/api/search?q=الله&limit=5"
-
-# Get available translations
-curl "https://your-api-name.your-account.workers.dev/api/translations"
-
-# Get English translation of a verse
-curl "https://your-api-name.your-account.workers.dev/api/translations/en.hilali/verses/1/1"
-
-# Compare translations
-curl "https://your-api-name.your-account.workers.dev/api/compare/1/1"
+curl "https://your-api-name.your-account.workers.dev/api/compare/2/255"
 ```
 
-### **Python**
+### Python
 ```python
 import requests
 
@@ -208,16 +118,12 @@ response = requests.get(f"{API_BASE}/search", params={
 data = response.json()
 print(f"Found {data['resultCount']} verses")
 
-# Get translations
-translations = requests.get(f"{API_BASE}/translations").json()
-for trans in translations:
-    print(f"{trans['language_name']}: {trans['translator']}")
-
-# Compare verse in multiple languages
-comparison = requests.get(f"{API_BASE}/compare/2/255").json()
-print("Arabic:", comparison['arabic']['text'])
-for key, trans in comparison['translations'].items():
-    print(f"{trans['language_name']}:", trans['text'])
+# Get verse with translations
+response = requests.get(f"{API_BASE}/compare/1/1")
+data = response.json()
+print(f"Arabic: {data['arabic']['text']}")
+print(f"English: {data['translations']['en.hilali']['text']}")
+print(f"Malay: {data['translations']['ms.basmeih']['text']}")
 ```
 
 ## 📁 Project Structure
@@ -225,12 +131,13 @@ for key, trans in comparison['translations'].items():
 ```
 ├── src/
 │   ├── index.js          # Main Worker script
-│   └── quran-data.json   # Complete Quran data
-├── public/
-│   ├── index.html        # Test interface
-│   └── _redirects        # Pages redirects
+│   ├── quran-data.json   # Complete Quran data
+│   └── translations/     # Translation files
+│       ├── en.hilali.json    # English (Hilali-Khan)
+│       └── ms.basmeih.json   # Malay (Basmeih)
+├── scripts/
+│   └── parse-xml-translations.js  # Translation parser
 ├── deploy.sh             # One-click deployment script
-├── DEPLOYMENT.md         # Detailed deployment guide
 ├── package.json          # Dependencies
 ├── wrangler.toml         # Workers config
 └── README.md            # This file
@@ -246,28 +153,21 @@ npm install -g wrangler
 wrangler login
 ```
 
-### Deploy API (Workers)
+### Deploy API
 ```bash
 npm install
 wrangler deploy
-```
-
-### Deploy Test Interface (Pages)
-```bash
-wrangler pages deploy public --project-name=your-project-name
 ```
 
 ## 💰 Cost Breakdown
 
 ### **Free Tier (Perfect for Most Users)**
 - **Cloudflare Workers**: 100,000 requests/day
-- **Cloudflare Pages**: Unlimited static hosting
 - **Custom Domain**: Free with Cloudflare
 - **Total Cost: $0/month** 🎉
 
 ### **Paid Tier (High Traffic)**
 - **Workers**: $5/month for 10M requests
-- **Pages**: Still free
 - **Enterprise**: Custom pricing available
 
 ## 🔒 Security & Best Practices
@@ -277,35 +177,6 @@ wrangler pages deploy public --project-name=your-project-name
 - ✅ Rate limiting ready (optional)
 - ✅ Environment variables support
 - ✅ No sensitive data in code
-- ✅ **Subdomain conflict handling** - automatic retry with new names
-- ✅ **Input validation** - prevents invalid project names
-
-## ⚠️ Common Issues & Solutions
-
-### **Subdomain Already Taken**
-If you see errors like "subdomain already taken" or "name already exists":
-
-```bash
-# Use the smart deployment script (handles conflicts automatically)
-./deploy-smart.sh
-
-# Or manually choose unique names:
-# Instead of: quran-api
-# Try: quran-api-masjid, quran-api-2024, my-quran-api
-```
-
-### **Name Requirements**
-- **Workers**: Only letters, numbers, and hyphens (max 63 characters)
-- **Pages**: Only letters, numbers, and hyphens
-- **Avoid**: Special characters, spaces, underscores
-
-### **Deployment Failures**
-```bash
-# Check your internet connection
-# Ensure you're logged into Cloudflare: wrangler login
-# Try a different name if subdomain conflicts occur
-# Use deploy-smart.sh for automatic conflict resolution
-```
 
 ## 📊 Data Source & Attribution
 
@@ -313,8 +184,13 @@ If you see errors like "subdomain already taken" or "name already exists":
 - **Source**: [Tanzil.net](http://tanzil.net/) - Uthmani text
 - **License**: [Creative Commons Attribution-NoDerivs 3.0 Unported (CC BY-ND 3.0)](https://creativecommons.org/licenses/by-nd/3.0/)
 - **Attribution**: Quran text courtesy of Tanzil.net
-- **Accuracy**: Carefully verified and monitored text
-- **Note**: The Quran text is provided under Creative Commons license and may not be modified
+
+### **Translations**
+- **English**: Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan
+- **Malay**: Abdullah Muhammad Basmeih
+- **Source**: [Tanzil.net](http://tanzil.net/)
+- **License**: Non-commercial use with attribution
+- **Coverage**: Complete 114 chapters, 6,236 verses
 
 ### **API Software**
 - **License**: GPL-3.0 (maintaining compatibility with original JQuranTree project)
@@ -350,14 +226,7 @@ We welcome contributions that help more people deploy their own Quran APIs:
 - 🐛 Bug fixes and improvements
 - 📚 Documentation enhancements
 - 🌐 Translation additions
-- 🎨 Interface improvements
 - 🔧 Deployment optimizations
-
-## 📚 Documentation
-
-- **[Deployment Guide](DEPLOYMENT.md)**: Comprehensive setup instructions
-- **[API Documentation](https://quran-api.asrulmunir.workers.dev/api)**: Complete API reference
-- **[Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)**: Platform documentation
 
 ## 🔧 Development
 
@@ -365,7 +234,6 @@ Originally converted from the Java JQuranTree library to JavaScript for Cloudfla
 
 ### Key Technologies
 - **Cloudflare Workers**: Serverless API hosting
-- **Cloudflare Pages**: Static site hosting
 - **JavaScript ES6+**: Modern syntax and features
 - **Arabic Unicode**: Proper text processing and normalization
 

@@ -286,7 +286,7 @@ export default {
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization, Cache-Control',
       'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
     };
     

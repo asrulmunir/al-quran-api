@@ -1,2 +1,0 @@
-# Redirect API calls to the Workers API
-/api/* https://quran-api.asrulmunir.workers.dev/api/:splat 200
