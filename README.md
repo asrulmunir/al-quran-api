@@ -20,8 +20,9 @@ cd al-quran-api
 ## 📊 Features
 
 - **Complete Quran Access**: All 114 chapters, 6,236 verses, 77,430+ words
-- **Complete Translations**: English (Hilali-Khan) and Malay (Basmeih) from Tanzil.net
+- **Complete Translations**: English (Hilali-Khan), Malay (Basmeih), Chinese (Ma Jian), and Tamil (Jan Turst Foundation) from Tanzil.net
 - **Advanced Arabic Search**: Unicode normalization and text processing
+- **Multilingual Reverse Search**: Find verses by meaning in 4 languages
 - **RESTful API**: JSON responses with CORS enabled
 - **Global Performance**: Cloudflare edge deployment
 - **Free Hosting**: 100K requests/day on Cloudflare's free tier
@@ -93,10 +94,10 @@ This endpoint provides:
 - **`limit`**: Maximum results (default: 50)
 
 ### **🔄 Reverse Search in Translations (`/api/search/translation`)**
-Find verses by searching in English or Malay translations - perfect for non-Arabic speakers!
+Find verses by searching in English, Malay, Chinese, or Tamil translations - perfect for non-Arabic speakers!
 
-- **`q`**: Search query in English or Malay (required)
-- **`lang`**: Language - `en` for English, `ms` for Malay (default: en)
+- **`q`**: Search query in English, Malay, Chinese, or Tamil (required)
+- **`lang`**: Language - `en` for English, `ms` for Malay, `zh` for Chinese, `ta` for Tamil (default: en)
 - **`type`**: `exact` or `substring` (default: substring)
 - **`limit`**: Maximum results (default: 50)
 - **`include_arabic`**: Include Arabic text in results (default: true)
@@ -109,16 +110,21 @@ Find verses by searching in English or Malay translations - perfect for non-Arab
 # Find verses about love in Malay
 /api/search/translation?q=kasih&lang=ms
 
+# Find verses about Allah in Chinese
+/api/search/translation?q=真主&lang=zh
+
+# Find verses about God in Tamil
+/api/search/translation?q=அல்லாஹ்&lang=ta
+
 # Exact word search for "forgiveness"
 /api/search/translation?q=forgiveness&lang=en&type=exact
-
-# Search without Arabic text in results
-/api/search/translation?q=guidance&lang=en&include_arabic=false
 ```
 
 #### **Popular Search Terms:**
 - **English**: mercy, forgiveness, guidance, paradise, prayer, faith, charity, patience
 - **Malay**: kasih, ampun, petunjuk, syurga, solat, iman, sedekah, sabar
+- **Chinese**: 真主, 慈悲, 宽恕, 引导, 天堂, 祈祷, 信仰, 施舍
+- **Tamil**: அல்லாஹ், கருணை, மன்னிப்பு, வழிகாட்டுதல், சொர்க்கம், தொழுகை, நம்பிக்கை, தர்மம்
 
 ## 💻 Usage Examples
 
@@ -167,6 +173,8 @@ curl "https://your-api-name.your-account.workers.dev/api/compare/2/255"
 # Reverse search examples
 curl "https://your-api-name.your-account.workers.dev/api/search/translation?q=mercy&lang=en&limit=5"
 curl "https://your-api-name.your-account.workers.dev/api/search/translation?q=kasih&lang=ms&limit=5"
+curl "https://your-api-name.your-account.workers.dev/api/search/translation?q=真主&lang=zh&limit=5"
+curl "https://your-api-name.your-account.workers.dev/api/search/translation?q=அல்லாஹ்&lang=ta&limit=5"
 ```
 
 ### Python
@@ -266,9 +274,11 @@ wrangler deploy
 ### **Translations**
 - **English**: Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan
 - **Malay**: Abdullah Muhammad Basmeih
+- **Chinese**: Ma Jian
+- **Tamil**: Jan Turst Foundation
 - **Source**: [Tanzil.net](http://tanzil.net/)
 - **License**: Non-commercial use with attribution
-- **Coverage**: Complete 114 chapters, 6,236 verses
+- **Coverage**: Complete 114 chapters, 6,236 verses each
 
 ### **API Software**
 - **License**: GPL-3.0 (maintaining compatibility with original JQuranTree project)

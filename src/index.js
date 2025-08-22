@@ -2,11 +2,15 @@
 import quranData from './quran-data.json';
 import enHilali from './translations/en.hilali.json';
 import msBasmeih from './translations/ms.basmeih.json';
+import zhJian from './translations/zh.jian.json';
+import taTamil from './translations/ta.tamil.json';
 
 // Available translations
 const translations = {
   'en.hilali': enHilali,
-  'ms.basmeih': msBasmeih
+  'ms.basmeih': msBasmeih,
+  'zh.jian': zhJian,
+  'ta.tamil': taTamil
 };
 
 // Unicode normalization utilities for Arabic text
@@ -644,7 +648,7 @@ export default {
       // GET /api/search/translation - Search within translations (reverse search)
       if (path === '/api/search/translation') {
         const query = url.searchParams.get('q');
-        const lang = url.searchParams.get('lang') || 'en'; // 'en' or 'ms'
+        const lang = url.searchParams.get('lang') || 'en'; // 'en', 'ms', 'zh', or 'ta'
         const type = url.searchParams.get('type') || 'substring'; // 'exact' or 'substring'
         const limit = parseInt(url.searchParams.get('limit')) || 50;
         const includeArabic = url.searchParams.get('include_arabic') !== 'false'; // default true
@@ -653,10 +657,12 @@ export default {
           return addCorsHeaders(new Response(JSON.stringify({ 
             error: 'Query parameter "q" is required',
             usage: 'GET /api/search/translation?q=mercy&lang=en&type=substring&limit=20',
-            supportedLanguages: ['en', 'ms'],
+            supportedLanguages: ['en', 'ms', 'zh', 'ta'],
             examples: {
               english: '/api/search/translation?q=forgiveness&lang=en',
-              malay: '/api/search/translation?q=kasih&lang=ms'
+              malay: '/api/search/translation?q=kasih&lang=ms',
+              chinese: '/api/search/translation?q=真主&lang=zh',
+              tamil: '/api/search/translation?q=கடவுள்&lang=ta'
             }
           }), { 
             status: 400,
@@ -665,7 +671,7 @@ export default {
         }
 
         // Validate language
-        const supportedLangs = ['en', 'ms'];
+        const supportedLangs = ['en', 'ms', 'zh', 'ta'];
         if (!supportedLangs.includes(lang)) {
           return addCorsHeaders(new Response(JSON.stringify({ 
             error: `Unsupported language: ${lang}`,
@@ -677,7 +683,13 @@ export default {
         }
 
         // Get the appropriate translation key
-        const translationKey = lang === 'en' ? 'en.hilali' : 'ms.basmeih';
+        const translationKeyMap = {
+          'en': 'en.hilali',
+          'ms': 'ms.basmeih', 
+          'zh': 'zh.jian',
+          'ta': 'ta.tamil'
+        };
+        const translationKey = translationKeyMap[lang];
         const translation = translations[translationKey];
         
         if (!translation) {
@@ -868,6 +880,18 @@ export default {
                 "name": "Al-Quran - Terjemahan Bahasa Melayu",
                 "translator": "Abdullah Muhammad Basmeih",
                 "coverage": "Complete - all 114 chapters and 6,236 verses"
+              },
+              "chinese": {
+                "key": "zh.jian",
+                "name": "The Noble Quran - Chinese Translation",
+                "translator": "Ma Jian",
+                "coverage": "Complete - all 114 chapters and 6,236 verses"
+              },
+              "tamil": {
+                "key": "ta.tamil",
+                "name": "The Noble Quran - Tamil Translation",
+                "translator": "Jan Turst Foundation",
+                "coverage": "Complete - all 114 chapters and 6,236 verses"
               }
             }
           },
@@ -987,12 +1011,12 @@ export default {
 
             "search_translations": {
               "endpoint": "GET /api/search/translation",
-              "description": "Reverse search - find verses by searching within English or Malay translations",
+              "description": "Reverse search - find verses by searching within English, Malay, Chinese, or Tamil translations",
               "required_parameters": {
-                "q": "Search query in English or Malay"
+                "q": "Search query in English, Malay, Chinese, or Tamil"
               },
               "optional_parameters": {
-                "lang": "Language: 'en' for English, 'ms' for Malay (default: en)",
+                "lang": "Language: 'en' for English, 'ms' for Malay, 'zh' for Chinese, 'ta' for Tamil (default: en)",
                 "type": "Search type: 'exact' or 'substring' (default: substring)",
                 "limit": "Maximum results to return (default: 50)",
                 "include_arabic": "Include Arabic text in results: true/false (default: true)"
@@ -1000,18 +1024,23 @@ export default {
               "example_urls": [
                 "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=mercy&lang=en",
                 "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=kasih&lang=ms",
-                "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=forgiveness&lang=en&type=exact&limit=10"
+                "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=真主&lang=zh",
+                "https://quran-api.asrulmunir.workers.dev/api/search/translation?q=கடவுள்&lang=ta"
               ],
               "response_fields": ["query", "language", "languageName", "translator", "searchType", "includeArabic", "resultCount", "results", "hasMore", "searchInfo"],
               "supported_languages": {
                 "en": "English (Hilali-Khan translation)",
-                "ms": "Bahasa Melayu (Basmeih translation)"
+                "ms": "Bahasa Melayu (Basmeih translation)",
+                "zh": "中文 简体 (Ma Jian translation)",
+                "ta": "தமிழ் (Jan Turst Foundation translation)"
               },
               "search_examples": {
                 "english_terms": ["mercy", "forgiveness", "guidance", "paradise", "prayer", "faith", "charity", "patience"],
-                "malay_terms": ["kasih", "ampun", "petunjuk", "syurga", "solat", "iman", "sedekah", "sabar"]
+                "malay_terms": ["kasih", "ampun", "petunjuk", "syurga", "solat", "iman", "sedekah", "sabar"],
+                "chinese_terms": ["真主", "慈悲", "宽恕", "引导", "天堂", "祈祷", "信仰", "施舍"],
+                "tamil_terms": ["கடவுள்", "கருணை", "மன்னிப்பு", "வழிகாட்டுதல்", "சொர்க்கம்", "தொழுகை", "நம்பிக்கை", "தர்மம்"]
               },
-              "use_cases": ["Find verses by meaning", "Thematic studies in native language", "Educational content", "Concept-based research", "Non-Arabic speaker assistance"]
+              "use_cases": ["Find verses by meaning", "Thematic studies in native language", "Educational content", "Concept-based research", "Non-Arabic speaker assistance", "Malaysian multilingual support"]
             },
 
             "list_translations": {
@@ -1102,20 +1131,21 @@ export default {
             "when_to_use": [
               "User asks about Quran verses, chapters, or translations",
               "User wants to search for specific Arabic terms in the Quran",
-              "User wants to find verses by meaning in English or Malay",
+              "User wants to find verses by meaning in English, Malay, Chinese, or Tamil",
               "User needs Islamic content for applications or research",
               "User wants to compare different translations of verses",
               "User asks for Quranic statistics or information",
-              "User searches for concepts like 'mercy', 'forgiveness', 'guidance' in their language"
+              "User searches for concepts in their native language (Malaysian multilingual support)"
             ],
             "how_to_help": [
               "Use /api/search to find verses containing specific Arabic terms",
-              "Use /api/search/translation to find verses by English or Malay meaning",
-              "Use /api/compare to show verses in Arabic with English and Malay translations",
+              "Use /api/search/translation to find verses by meaning in English, Malay, Chinese, or Tamil",
+              "Use /api/compare to show verses in Arabic with multiple translations",
               "Use /api/chapters to list all chapters for navigation",
               "Use /api/verses for specific verse lookups",
               "Always provide both Arabic text and translations when available",
               "For non-Arabic speakers, use translation search to find verses by concept",
+              "Support Malaysian users with their preferred language (English/Malay/Chinese/Tamil)",
               "Explain the context and significance of verses when appropriate",
               "Respect Islamic etiquette when handling Quranic content"
             ],
@@ -1123,6 +1153,9 @@ export default {
               "arabic_speakers": "Use /api/search with Arabic terms and normalization",
               "english_speakers": "Use /api/search/translation with lang=en for concept-based search",
               "malay_speakers": "Use /api/search/translation with lang=ms for concept-based search",
+              "chinese_speakers": "Use /api/search/translation with lang=zh for concept-based search",
+              "tamil_speakers": "Use /api/search/translation with lang=ta for concept-based search",
+              "malaysian_users": "Support all four languages (en/ms/zh/ta) based on user preference",
               "researchers": "Combine both Arabic and translation search for comprehensive results",
               "educators": "Use translation search to help students find verses by familiar concepts"
             },
