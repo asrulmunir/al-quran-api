@@ -71,6 +71,23 @@ cd al-quran-api
 | `GET /api/search/translation` | **🔍 Reverse search in translations** | [/api/search/translation?q=mercy&lang=en](https://quran-api.asrulmunir.workers.dev/api/search/translation?q=mercy&lang=en&limit=5) |
 | `GET /api/stats` | Statistics | [/api/stats](https://quran-api.asrulmunir.workers.dev/api/stats) |
 | `GET /api/LLM` | **LLM-friendly comprehensive guide** | [/api/LLM](https://quran-api.asrulmunir.workers.dev/api/LLM) |
+| `GET /api/spec` | **OpenAPI 3.0 specification** | [/api/spec](https://quran-api.asrulmunir.workers.dev/api/spec) |
+
+## 📋 API Specification
+
+### **OpenAPI 3.0 Specification**
+Complete, machine-readable API documentation following OpenAPI standards:
+
+- **📊 Live Spec**: [/api/spec](https://quran-api.asrulmunir.workers.dev/api/spec)
+- **📄 YAML Format**: [api-spec.yaml](https://github.com/asrulmunir/al-quran-api/blob/main/api-spec.yaml)
+- **📄 JSON Format**: [api-spec.json](https://github.com/asrulmunir/al-quran-api/blob/main/api-spec.json)
+
+**Perfect for:**
+- 🔧 **API clients** and SDK generation
+- 📚 **Documentation tools** (Swagger UI, Redoc)
+- 🧪 **Testing frameworks** and automation
+- 🤖 **AI/LLM integration** and understanding
+- 📊 **API management** platforms
 
 ## 🤖 AI/LLM Integration
 

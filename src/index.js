@@ -1181,6 +1181,282 @@ export default {
           headers: { 'Content-Type': 'application/json' }
         }));
       }
+
+      // GET /api/spec - OpenAPI specification
+      if (path === '/api/spec') {
+        const apiSpec = {
+          openapi: "3.0.3",
+          info: {
+            title: "Al-Quran API",
+            description: "Complete RESTful API for accessing the Holy Quran with Arabic text, English, Malay, Chinese, and Tamil translations, and advanced search capabilities.",
+            version: "1.0.0",
+            contact: {
+              name: "Al-Quran API",
+              url: "https://github.com/asrulmunir/al-quran-api"
+            },
+            license: {
+              name: "GPL-3.0",
+              url: "https://github.com/asrulmunir/al-quran-api/blob/main/LICENSE"
+            }
+          },
+          servers: [
+            {
+              url: "https://quran-api.asrulmunir.workers.dev",
+              description: "Production server (Cloudflare Workers)"
+            }
+          ],
+          externalDocs: {
+            description: "Complete API specification and documentation",
+            url: "https://github.com/asrulmunir/al-quran-api/blob/main/api-spec.yaml"
+          },
+          paths: {
+            "/api/info": {
+              get: {
+                summary: "Get basic Quran information",
+                tags: ["Information"],
+                responses: {
+                  "200": {
+                    description: "Basic Quran information",
+                    content: {
+                      "application/json": {
+                        schema: {
+                          type: "object",
+                          properties: {
+                            name: { type: "string" },
+                            chapterCount: { type: "integer" },
+                            verseCount: { type: "integer" },
+                            tokenCount: { type: "integer" },
+                            version: { type: "string" },
+                            source: { type: "string" },
+                            license: { type: "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "/api/chapters": {
+              get: {
+                summary: "List all chapters",
+                tags: ["Chapters"],
+                responses: {
+                  "200": {
+                    description: "List of all chapters"
+                  }
+                }
+              }
+            },
+            "/api/chapters/{id}": {
+              get: {
+                summary: "Get specific chapter",
+                tags: ["Chapters"],
+                parameters: [
+                  {
+                    name: "id",
+                    in: "path",
+                    required: true,
+                    description: "Chapter number (1-114)",
+                    schema: { type: "integer", minimum: 1, maximum: 114 }
+                  }
+                ],
+                responses: {
+                  "200": { description: "Complete chapter with verses" },
+                  "404": { description: "Chapter not found" }
+                }
+              }
+            },
+            "/api/verses/{chapter}/{verse}": {
+              get: {
+                summary: "Get specific verse",
+                tags: ["Verses"],
+                parameters: [
+                  {
+                    name: "chapter",
+                    in: "path",
+                    required: true,
+                    description: "Chapter number (1-114)",
+                    schema: { type: "integer", minimum: 1, maximum: 114 }
+                  },
+                  {
+                    name: "verse",
+                    in: "path",
+                    required: true,
+                    description: "Verse number within chapter",
+                    schema: { type: "integer", minimum: 1 }
+                  }
+                ],
+                responses: {
+                  "200": { description: "Specific verse details" },
+                  "404": { description: "Verse not found" }
+                }
+              }
+            },
+            "/api/compare/{chapter}/{verse}": {
+              get: {
+                summary: "Compare translations",
+                tags: ["Translations"],
+                parameters: [
+                  {
+                    name: "chapter",
+                    in: "path",
+                    required: true,
+                    description: "Chapter number (1-114)",
+                    schema: { type: "integer", minimum: 1, maximum: 114 }
+                  },
+                  {
+                    name: "verse",
+                    in: "path",
+                    required: true,
+                    description: "Verse number within chapter",
+                    schema: { type: "integer", minimum: 1 }
+                  }
+                ],
+                responses: {
+                  "200": { description: "Verse with all translations" },
+                  "404": { description: "Verse not found" }
+                }
+              }
+            },
+            "/api/translations": {
+              get: {
+                summary: "List available translations",
+                tags: ["Translations"],
+                responses: {
+                  "200": { description: "List of available translations" }
+                }
+              }
+            },
+            "/api/search": {
+              get: {
+                summary: "Search Arabic text",
+                tags: ["Search"],
+                parameters: [
+                  {
+                    name: "q",
+                    in: "query",
+                    required: true,
+                    description: "Search query in Arabic text",
+                    schema: { type: "string" }
+                  },
+                  {
+                    name: "type",
+                    in: "query",
+                    required: false,
+                    description: "Search type",
+                    schema: { type: "string", enum: ["exact", "substring"], default: "substring" }
+                  },
+                  {
+                    name: "normalize",
+                    in: "query",
+                    required: false,
+                    description: "Arabic text normalization",
+                    schema: { type: "boolean", default: false }
+                  },
+                  {
+                    name: "limit",
+                    in: "query",
+                    required: false,
+                    description: "Maximum results to return",
+                    schema: { type: "integer", minimum: 1, maximum: 100, default: 50 }
+                  }
+                ],
+                responses: {
+                  "200": { description: "Search results" },
+                  "400": { description: "Invalid query parameters" }
+                }
+              }
+            },
+            "/api/search/translation": {
+              get: {
+                summary: "Reverse search in translations",
+                tags: ["Search"],
+                parameters: [
+                  {
+                    name: "q",
+                    in: "query",
+                    required: true,
+                    description: "Search query in English, Malay, Chinese, or Tamil",
+                    schema: { type: "string" }
+                  },
+                  {
+                    name: "lang",
+                    in: "query",
+                    required: false,
+                    description: "Language code",
+                    schema: { type: "string", enum: ["en", "ms", "zh", "ta"], default: "en" }
+                  },
+                  {
+                    name: "type",
+                    in: "query",
+                    required: false,
+                    description: "Search type",
+                    schema: { type: "string", enum: ["exact", "substring"], default: "substring" }
+                  },
+                  {
+                    name: "limit",
+                    in: "query",
+                    required: false,
+                    description: "Maximum results to return",
+                    schema: { type: "integer", minimum: 1, maximum: 100, default: 50 }
+                  },
+                  {
+                    name: "include_arabic",
+                    in: "query",
+                    required: false,
+                    description: "Include Arabic text in results",
+                    schema: { type: "boolean", default: true }
+                  }
+                ],
+                responses: {
+                  "200": { description: "Translation search results" },
+                  "400": { description: "Invalid query parameters" }
+                }
+              }
+            },
+            "/api/stats": {
+              get: {
+                summary: "Get statistics",
+                tags: ["Information"],
+                responses: {
+                  "200": { description: "Detailed Quran statistics" }
+                }
+              }
+            },
+            "/api/LLM": {
+              get: {
+                summary: "LLM-friendly comprehensive guide",
+                tags: ["Documentation"],
+                responses: {
+                  "200": { description: "LLM-friendly API documentation" }
+                }
+              }
+            },
+            "/api/spec": {
+              get: {
+                summary: "OpenAPI specification",
+                tags: ["Documentation"],
+                responses: {
+                  "200": { description: "OpenAPI 3.0 specification" }
+                }
+              }
+            }
+          },
+          tags: [
+            { name: "Information", description: "Basic information and statistics about the Quran" },
+            { name: "Chapters", description: "Operations related to Quran chapters" },
+            { name: "Verses", description: "Operations related to individual verses" },
+            { name: "Translations", description: "Operations related to translations" },
+            { name: "Search", description: "Search operations for Arabic text and translations" },
+            { name: "Documentation", description: "API documentation and guides" }
+          ]
+        };
+
+        return addCorsHeaders(new Response(JSON.stringify(apiSpec, null, 2), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
       
       return addCorsHeaders(new Response(JSON.stringify({ error: 'Not Found' }), { 
         status: 404,

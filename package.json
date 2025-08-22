@@ -8,12 +8,24 @@
     "deploy": "wrangler deploy",
     "prepare-data": "node scripts/convert-xml-to-json.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
   "devDependencies": {
     "wrangler": "^3.0.0",
     "xmldom": "^0.6.0"
   },
-  "keywords": ["quran", "al-quran", "api", "cloudflare", "workers", "islamic", "tanzil", "arabic", "search"],
+  "keywords": [
+    "quran",
+    "al-quran",
+    "api",
+    "cloudflare",
+    "workers",
+    "islamic",
+    "tanzil",
+    "arabic",
+    "search"
+  ],
   "author": "Al-Quran API Community",
   "license": "GPL-3.0",
   "repository": {

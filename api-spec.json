@@ -1,0 +1,1017 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Al-Quran API",
+    "description": "Complete RESTful API for accessing the Holy Quran with Arabic text, English, Malay, Chinese, and Tamil translations, and advanced search capabilities.\n\n## Features\n- Complete Quran access (114 chapters, 6,236 verses)\n- Multilingual translations (English, Malay, Chinese, Tamil)\n- Advanced Arabic search with normalization\n- Reverse search in translations\n- Translation comparison\n- LLM-friendly documentation\n\n## Live Demo\n- **API**: https://quran-api.asrulmunir.workers.dev\n- **Demo UI**: https://al-quran-ui.asrulmunir.workers.dev\n- **Source**: https://github.com/asrulmunir/al-quran-api\n",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Al-Quran API",
+      "url": "https://github.com/asrulmunir/al-quran-api"
+    },
+    "license": {
+      "name": "GPL-3.0",
+      "url": "https://github.com/asrulmunir/al-quran-api/blob/main/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://quran-api.asrulmunir.workers.dev",
+      "description": "Production server (Cloudflare Workers)"
+    }
+  ],
+  "paths": {
+    "/api/info": {
+      "get": {
+        "summary": "Get basic Quran information",
+        "description": "Returns basic statistics and information about the Quran",
+        "tags": [
+          "Information"
+        ],
+        "responses": {
+          "200": {
+            "description": "Basic Quran information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuranInfo"
+                },
+                "example": {
+                  "name": "Al-Quran",
+                  "chapterCount": 114,
+                  "verseCount": 6236,
+                  "tokenCount": 77430,
+                  "version": "1.0.0",
+                  "source": "Tanzil.net",
+                  "license": "Creative Commons Attribution-NoDerivs 3.0 Unported (CC BY-ND 3.0)"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chapters": {
+      "get": {
+        "summary": "List all chapters",
+        "description": "Returns a list of all 114 chapters with basic information",
+        "tags": [
+          "Chapters"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all chapters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChapterSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chapters/{id}": {
+      "get": {
+        "summary": "Get specific chapter",
+        "description": "Returns a complete chapter with all verses in Arabic",
+        "tags": [
+          "Chapters"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Chapter number (1-114)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 114
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complete chapter with verses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chapter"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Chapter not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verses/{chapter}/{verse}": {
+      "get": {
+        "summary": "Get specific verse",
+        "description": "Returns a specific verse in Arabic with detailed information",
+        "tags": [
+          "Verses"
+        ],
+        "parameters": [
+          {
+            "name": "chapter",
+            "in": "path",
+            "required": true,
+            "description": "Chapter number (1-114)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 114
+            }
+          },
+          {
+            "name": "verse",
+            "in": "path",
+            "required": true,
+            "description": "Verse number within chapter",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Specific verse details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Verse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Verse not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/compare/{chapter}/{verse}": {
+      "get": {
+        "summary": "Compare translations",
+        "description": "Get verse in Arabic with all available translations side-by-side",
+        "tags": [
+          "Translations"
+        ],
+        "parameters": [
+          {
+            "name": "chapter",
+            "in": "path",
+            "required": true,
+            "description": "Chapter number (1-114)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 114
+            }
+          },
+          {
+            "name": "verse",
+            "in": "path",
+            "required": true,
+            "description": "Verse number within chapter",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verse with all translations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerseComparison"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Verse not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/translations": {
+      "get": {
+        "summary": "List available translations",
+        "description": "Returns a list of all available translations",
+        "tags": [
+          "Translations"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of available translations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Translation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/search": {
+      "get": {
+        "summary": "Search Arabic text",
+        "description": "Search for verses containing specific Arabic text with advanced options",
+        "tags": [
+          "Search"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query in Arabic text",
+            "schema": {
+              "type": "string"
+            },
+            "example": "الله"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "Search type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "exact",
+                "substring"
+              ],
+              "default": "substring"
+            }
+          },
+          {
+            "name": "normalize",
+            "in": "query",
+            "required": false,
+            "description": "Arabic text normalization",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/search/translation": {
+      "get": {
+        "summary": "Reverse search in translations",
+        "description": "Find verses by searching within English, Malay, Chinese, or Tamil translations",
+        "tags": [
+          "Search"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query in English, Malay, Chinese, or Tamil",
+            "schema": {
+              "type": "string"
+            },
+            "example": "mercy"
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "description": "Language code",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ms",
+                "zh",
+                "ta"
+              ],
+              "default": "en"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "Search type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "exact",
+                "substring"
+              ],
+              "default": "substring"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "include_arabic",
+            "in": "query",
+            "required": false,
+            "description": "Include Arabic text in results",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Translation search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslationSearchResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stats": {
+      "get": {
+        "summary": "Get statistics",
+        "description": "Returns detailed statistics about the Quran",
+        "tags": [
+          "Information"
+        ],
+        "responses": {
+          "200": {
+            "description": "Detailed Quran statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Statistics"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/LLM": {
+      "get": {
+        "summary": "LLM-friendly comprehensive guide",
+        "description": "Complete API documentation designed specifically for AI assistants and Large Language Models",
+        "tags": [
+          "Documentation"
+        ],
+        "responses": {
+          "200": {
+            "description": "LLM-friendly API documentation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMGuide"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "QuranInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Al-Quran"
+          },
+          "chapterCount": {
+            "type": "integer",
+            "example": 114
+          },
+          "verseCount": {
+            "type": "integer",
+            "example": 6236
+          },
+          "tokenCount": {
+            "type": "integer",
+            "example": 77430
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "source": {
+            "type": "string",
+            "example": "Tanzil.net"
+          },
+          "license": {
+            "type": "string",
+            "example": "Creative Commons Attribution-NoDerivs 3.0 Unported (CC BY-ND 3.0)"
+          }
+        }
+      },
+      "ChapterSummary": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Al-Fatihah"
+          },
+          "verseCount": {
+            "type": "integer",
+            "example": 7
+          },
+          "tokenCount": {
+            "type": "integer",
+            "example": 29
+          },
+          "bismillah": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "Chapter": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Al-Fatihah"
+          },
+          "verseCount": {
+            "type": "integer",
+            "example": 7
+          },
+          "tokenCount": {
+            "type": "integer",
+            "example": 29
+          },
+          "bismillah": {
+            "type": "boolean",
+            "example": true
+          },
+          "verses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerseText"
+            }
+          }
+        }
+      },
+      "VerseText": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "example": 1
+          },
+          "text": {
+            "type": "string",
+            "example": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+          },
+          "location": {
+            "type": "string",
+            "example": "1:1"
+          },
+          "tokenCount": {
+            "type": "integer",
+            "example": 4
+          }
+        }
+      },
+      "Verse": {
+        "type": "object",
+        "properties": {
+          "chapterNumber": {
+            "type": "integer",
+            "example": 1
+          },
+          "verseNumber": {
+            "type": "integer",
+            "example": 1
+          },
+          "text": {
+            "type": "string",
+            "example": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+          },
+          "location": {
+            "type": "string",
+            "example": "1:1"
+          },
+          "tokenCount": {
+            "type": "integer",
+            "example": 4
+          },
+          "tokens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Token"
+            }
+          }
+        }
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "example": 1
+          },
+          "text": {
+            "type": "string",
+            "example": "بِسْمِ"
+          },
+          "location": {
+            "type": "string",
+            "example": "1:1:1"
+          }
+        }
+      },
+      "VerseComparison": {
+        "type": "object",
+        "properties": {
+          "chapterNumber": {
+            "type": "integer",
+            "example": 1
+          },
+          "verseNumber": {
+            "type": "integer",
+            "example": 1
+          },
+          "arabic": {
+            "$ref": "#/components/schemas/ArabicText"
+          },
+          "translations": {
+            "type": "object",
+            "properties": {
+              "en.hilali": {
+                "$ref": "#/components/schemas/TranslationText"
+              },
+              "ms.basmeih": {
+                "$ref": "#/components/schemas/TranslationText"
+              },
+              "zh.jian": {
+                "$ref": "#/components/schemas/TranslationText"
+              },
+              "ta.tamil": {
+                "$ref": "#/components/schemas/TranslationText"
+              }
+            }
+          }
+        }
+      },
+      "ArabicText": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "example": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+          },
+          "source": {
+            "type": "string",
+            "example": "Tanzil.net Uthmani"
+          }
+        }
+      },
+      "TranslationText": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "example": "In the Name of Allah, the Most Beneficent, the Most Merciful."
+          },
+          "translator": {
+            "type": "string",
+            "example": "Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan"
+          },
+          "language": {
+            "type": "string",
+            "example": "en"
+          },
+          "language_name": {
+            "type": "string",
+            "example": "English"
+          }
+        }
+      },
+      "Translation": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "en.hilali"
+          },
+          "name": {
+            "type": "string",
+            "example": "The Noble Quran - English Translation"
+          },
+          "translator": {
+            "type": "string",
+            "example": "Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan"
+          },
+          "language": {
+            "type": "string",
+            "example": "en"
+          },
+          "language_name": {
+            "type": "string",
+            "example": "English"
+          },
+          "source": {
+            "type": "string",
+            "example": "Tanzil.net"
+          }
+        }
+      },
+      "SearchResults": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "example": "الله"
+          },
+          "type": {
+            "type": "string",
+            "example": "substring"
+          },
+          "normalize": {
+            "type": "boolean",
+            "example": true
+          },
+          "resultCount": {
+            "type": "integer",
+            "example": 2699
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResult"
+            }
+          },
+          "hasMore": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "properties": {
+          "chapterNumber": {
+            "type": "integer",
+            "example": 1
+          },
+          "verseNumber": {
+            "type": "integer",
+            "example": 1
+          },
+          "text": {
+            "type": "string",
+            "example": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+          },
+          "location": {
+            "type": "string",
+            "example": "1:1"
+          }
+        }
+      },
+      "TranslationSearchResults": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "example": "mercy"
+          },
+          "language": {
+            "type": "string",
+            "example": "en"
+          },
+          "languageName": {
+            "type": "string",
+            "example": "English"
+          },
+          "translator": {
+            "type": "string",
+            "example": "Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan"
+          },
+          "searchType": {
+            "type": "string",
+            "example": "substring"
+          },
+          "includeArabic": {
+            "type": "boolean",
+            "example": true
+          },
+          "resultCount": {
+            "type": "integer",
+            "example": 158
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranslationSearchResult"
+            }
+          },
+          "hasMore": {
+            "type": "boolean",
+            "example": true
+          },
+          "searchInfo": {
+            "type": "object",
+            "properties": {
+              "totalVerses": {
+                "type": "integer",
+                "example": 6236
+              },
+              "searchedIn": {
+                "type": "string",
+                "example": "The Noble Quran - English Translation by Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan"
+              }
+            }
+          }
+        }
+      },
+      "TranslationSearchResult": {
+        "type": "object",
+        "properties": {
+          "chapterNumber": {
+            "type": "integer",
+            "example": 2
+          },
+          "verseNumber": {
+            "type": "integer",
+            "example": 64
+          },
+          "chapterName": {
+            "type": "string",
+            "example": "Al-Baqarah"
+          },
+          "chapterNameArabic": {
+            "type": "string",
+            "example": "البقرة"
+          },
+          "translation": {
+            "$ref": "#/components/schemas/TranslationText"
+          },
+          "arabic": {
+            "$ref": "#/components/schemas/ArabicText"
+          }
+        }
+      },
+      "Statistics": {
+        "type": "object",
+        "properties": {
+          "totalChapters": {
+            "type": "integer",
+            "example": 114
+          },
+          "totalVerses": {
+            "type": "integer",
+            "example": 6236
+          },
+          "totalTokens": {
+            "type": "integer",
+            "example": 77430
+          },
+          "longestChapter": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "integer",
+                "example": 2
+              },
+              "name": {
+                "type": "string",
+                "example": "Al-Baqarah"
+              },
+              "verseCount": {
+                "type": "integer",
+                "example": 286
+              }
+            }
+          },
+          "shortestChapter": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "integer",
+                "example": 108
+              },
+              "name": {
+                "type": "string",
+                "example": "Al-Kawthar"
+              },
+              "verseCount": {
+                "type": "integer",
+                "example": 3
+              }
+            }
+          },
+          "averageVersesPerChapter": {
+            "type": "number",
+            "example": 54.7
+          }
+        }
+      },
+      "LLMGuide": {
+        "type": "object",
+        "properties": {
+          "api_name": {
+            "type": "string",
+            "example": "Al-Quran API"
+          },
+          "description": {
+            "type": "string"
+          },
+          "base_url": {
+            "type": "string",
+            "example": "https://quran-api.asrulmunir.workers.dev"
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "authentication": {
+            "type": "string",
+            "example": "None required - Public API"
+          },
+          "rate_limits": {
+            "type": "string",
+            "example": "100,000 requests/day on free tier"
+          },
+          "cors": {
+            "type": "string",
+            "example": "Enabled for all origins"
+          },
+          "data_coverage": {
+            "type": "object"
+          },
+          "endpoints": {
+            "type": "object"
+          },
+          "common_use_cases": {
+            "type": "object"
+          },
+          "response_formats": {
+            "type": "object"
+          },
+          "best_practices": {
+            "type": "object"
+          },
+          "integration_examples": {
+            "type": "object"
+          },
+          "llm_assistant_guidance": {
+            "type": "object"
+          },
+          "islamic_etiquette": {
+            "type": "object"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Not Found"
+          },
+          "details": {
+            "type": "string",
+            "example": "The requested resource was not found"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Information",
+      "description": "Basic information and statistics about the Quran"
+    },
+    {
+      "name": "Chapters",
+      "description": "Operations related to Quran chapters"
+    },
+    {
+      "name": "Verses",
+      "description": "Operations related to individual verses"
+    },
+    {
+      "name": "Translations",
+      "description": "Operations related to translations"
+    },
+    {
+      "name": "Search",
+      "description": "Search operations for Arabic text and translations"
+    },
+    {
+      "name": "Documentation",
+      "description": "API documentation and guides"
+    }
+  ],
+  "externalDocs": {
+    "description": "Find more info on GitHub",
+    "url": "https://github.com/asrulmunir/al-quran-api"
+  }
+}
