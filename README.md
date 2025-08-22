@@ -59,6 +59,29 @@ cd al-quran-api
 | `GET /api/translations` | List available translations | [/api/translations](https://quran-api.asrulmunir.workers.dev/api/translations) |
 | `GET /api/search` | Search text | [/api/search?q=الله&normalize=true](https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=5) |
 | `GET /api/stats` | Statistics | [/api/stats](https://quran-api.asrulmunir.workers.dev/api/stats) |
+| `GET /api/LLM` | **LLM-friendly comprehensive guide** | [/api/LLM](https://quran-api.asrulmunir.workers.dev/api/LLM) |
+
+## 🤖 AI/LLM Integration
+
+### **Special LLM Endpoint: `/api/LLM`**
+This API includes a special endpoint designed specifically for AI assistants and Large Language Models:
+
+**https://quran-api.asrulmunir.workers.dev/api/LLM**
+
+This endpoint provides:
+- ✅ **Comprehensive API documentation** in LLM-friendly format
+- ✅ **Detailed endpoint descriptions** with parameters and examples
+- ✅ **Common use cases** and integration patterns
+- ✅ **Best practices** for handling Quranic content
+- ✅ **Islamic etiquette guidelines** for respectful handling
+- ✅ **Code examples** in multiple programming languages
+- ✅ **Response format specifications** and error handling
+
+**Perfect for:**
+- 🤖 **AI assistants** helping users with Quranic queries
+- 🔧 **Automated tools** that need to understand the API structure
+- 📚 **Documentation generators** and API explorers
+- 🎯 **Integration planning** and development guidance
 
 ## 🔍 Search Parameters
 

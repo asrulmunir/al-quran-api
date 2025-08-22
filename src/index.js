@@ -710,6 +710,277 @@ export default {
           headers: { 'Content-Type': 'application/json' }
         }));
       }
+
+      // GET /api/LLM - LLM-friendly comprehensive API guide
+      if (path === '/api/LLM') {
+        const llmGuide = {
+          "api_name": "JQuranTree API",
+          "description": "Complete RESTful API for accessing the Holy Quran with Arabic text, English and Malay translations, and advanced search capabilities",
+          "base_url": "https://quran-api.asrulmunir.workers.dev",
+          "version": "1.0.0",
+          "authentication": "None required - Public API",
+          "rate_limits": "100,000 requests/day on free tier",
+          "cors": "Enabled for all origins",
+          
+          "data_coverage": {
+            "arabic_text": {
+              "source": "Tanzil.net Uthmani text",
+              "chapters": 114,
+              "verses": 6236,
+              "tokens": "77,430+",
+              "license": "Creative Commons Attribution-NoDerivs 3.0"
+            },
+            "translations": {
+              "english": {
+                "key": "en.hilali",
+                "name": "The Noble Quran - English Translation",
+                "translator": "Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan",
+                "coverage": "Complete - all 114 chapters and 6,236 verses"
+              },
+              "malay": {
+                "key": "ms.basmeih",
+                "name": "Al-Quran - Terjemahan Bahasa Melayu",
+                "translator": "Abdullah Muhammad Basmeih",
+                "coverage": "Complete - all 114 chapters and 6,236 verses"
+              }
+            }
+          },
+
+          "endpoints": {
+            "basic_info": {
+              "endpoint": "GET /api/info",
+              "description": "Get basic statistics about the Quran",
+              "parameters": "None",
+              "example_url": "https://quran-api.asrulmunir.workers.dev/api/info",
+              "response_fields": ["name", "chapterCount", "verseCount", "tokenCount", "version", "source", "license"],
+              "use_cases": ["Get API overview", "Display Quran statistics", "Verify API availability"]
+            },
+
+            "list_chapters": {
+              "endpoint": "GET /api/chapters",
+              "description": "Get list of all 114 chapters with basic information",
+              "parameters": "None",
+              "example_url": "https://quran-api.asrulmunir.workers.dev/api/chapters",
+              "response_fields": ["number", "name", "verseCount", "tokenCount", "bismillah"],
+              "use_cases": ["Display chapter index", "Navigation menus", "Chapter selection interfaces"]
+            },
+
+            "get_chapter": {
+              "endpoint": "GET /api/chapters/{id}",
+              "description": "Get complete chapter with all verses in Arabic",
+              "parameters": {
+                "id": "Chapter number (1-114)"
+              },
+              "example_url": "https://quran-api.asrulmunir.workers.dev/api/chapters/1",
+              "response_fields": ["number", "name", "verseCount", "tokenCount", "bismillah", "verses"],
+              "use_cases": ["Display complete chapter", "Reading interfaces", "Chapter analysis"],
+              "popular_chapters": {
+                "1": "Al-Fatihah (The Opening)",
+                "2": "Al-Baqarah (The Cow)",
+                "18": "Al-Kahf (The Cave)",
+                "36": "Ya-Sin",
+                "67": "Al-Mulk (The Sovereignty)",
+                "112": "Al-Ikhlas (The Sincerity)"
+              }
+            },
+
+            "get_verse": {
+              "endpoint": "GET /api/verses/{chapter}/{verse}",
+              "description": "Get specific verse in Arabic with detailed information",
+              "parameters": {
+                "chapter": "Chapter number (1-114)",
+                "verse": "Verse number within chapter"
+              },
+              "example_url": "https://quran-api.asrulmunir.workers.dev/api/verses/2/255",
+              "response_fields": ["chapterNumber", "verseNumber", "text", "location", "tokenCount", "tokens"],
+              "use_cases": ["Display specific verses", "Verse-by-verse study", "Citation and reference"],
+              "famous_verses": {
+                "1:1": "Bismillah (In the name of Allah)",
+                "2:255": "Ayat al-Kursi (Throne Verse)",
+                "112:1": "Qul Huwa Allahu Ahad (Say: He is Allah, the One)"
+              }
+            },
+
+            "compare_translations": {
+              "endpoint": "GET /api/compare/{chapter}/{verse}",
+              "description": "Get verse in Arabic with all available translations side-by-side",
+              "parameters": {
+                "chapter": "Chapter number (1-114)",
+                "verse": "Verse number within chapter"
+              },
+              "example_url": "https://quran-api.asrulmunir.workers.dev/api/compare/1/1",
+              "response_structure": {
+                "chapterNumber": "number",
+                "verseNumber": "number",
+                "arabic": {
+                  "text": "Arabic text in Uthmani script",
+                  "source": "Tanzil.net Uthmani"
+                },
+                "translations": {
+                  "en.hilali": {
+                    "text": "English translation text",
+                    "translator": "Dr. Muhammad Taqi-ud-Din Al-Hilali and Dr. Muhammad Muhsin Khan",
+                    "language": "en",
+                    "language_name": "English"
+                  },
+                  "ms.basmeih": {
+                    "text": "Malay translation text",
+                    "translator": "Abdullah Muhammad Basmeih",
+                    "language": "ms",
+                    "language_name": "Bahasa Melayu"
+                  }
+                }
+              },
+              "use_cases": ["Multi-language study", "Translation comparison", "Educational content", "Cross-reference analysis"]
+            },
+
+            "search_verses": {
+              "endpoint": "GET /api/search",
+              "description": "Search for verses containing specific Arabic text with advanced options",
+              "required_parameters": {
+                "q": "Search query in Arabic text"
+              },
+              "optional_parameters": {
+                "type": "Search type: 'exact' or 'substring' (default: substring)",
+                "normalize": "Arabic text normalization: true/false (default: false)",
+                "limit": "Maximum results to return (default: 50, max: 100)"
+              },
+              "example_urls": [
+                "https://quran-api.asrulmunir.workers.dev/api/search?q=الله",
+                "https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=10",
+                "https://quran-api.asrulmunir.workers.dev/api/search?q=بسم&type=substring&normalize=true"
+              ],
+              "response_fields": ["query", "type", "normalize", "resultCount", "results", "hasMore"],
+              "search_tips": {
+                "normalization": "Use normalize=true for better Arabic text matching",
+                "common_terms": ["الله (Allah)", "رب (Lord)", "رحمن (Rahman)", "رحيم (Rahim)", "بسم (Bismillah)"],
+                "exact_vs_substring": "Use 'exact' for precise word matching, 'substring' for partial matches"
+              },
+              "use_cases": ["Verse lookup", "Thematic research", "Word frequency analysis", "Content discovery"]
+            },
+
+            "list_translations": {
+              "endpoint": "GET /api/translations",
+              "description": "Get list of all available translations",
+              "parameters": "None",
+              "example_url": "https://quran-api.asrulmunir.workers.dev/api/translations",
+              "response_fields": ["key", "name", "translator", "language", "language_name", "source"],
+              "use_cases": ["Translation selection", "Language support check", "Attribution display"]
+            },
+
+            "get_statistics": {
+              "endpoint": "GET /api/stats",
+              "description": "Get detailed statistics about the Quran",
+              "parameters": "None",
+              "example_url": "https://quran-api.asrulmunir.workers.dev/api/stats",
+              "response_fields": ["totalChapters", "totalVerses", "totalTokens", "longestChapter", "shortestChapter", "averageVersesPerChapter"],
+              "use_cases": ["Analytics dashboards", "Educational statistics", "Data visualization"]
+            }
+          },
+
+          "common_use_cases": {
+            "mobile_apps": {
+              "description": "Islamic mobile applications",
+              "recommended_endpoints": ["/api/chapters", "/api/compare/{ch}/{v}", "/api/search"],
+              "example_flow": "1. Load chapters list → 2. User selects chapter → 3. Display with translations using /api/compare"
+            },
+            "web_interfaces": {
+              "description": "Quran study websites",
+              "recommended_endpoints": ["/api/chapters", "/api/verses/{ch}/{v}", "/api/search"],
+              "example_flow": "1. Search interface using /api/search → 2. Display results → 3. Click verse for details"
+            },
+            "research_tools": {
+              "description": "Academic and linguistic research",
+              "recommended_endpoints": ["/api/search", "/api/stats", "/api/verses/{ch}/{v}"],
+              "example_flow": "1. Search for terms → 2. Analyze frequency → 3. Get detailed verse data"
+            },
+            "masjid_systems": {
+              "description": "Mosque and Islamic center applications",
+              "recommended_endpoints": ["/api/chapters", "/api/compare/{ch}/{v}"],
+              "example_flow": "1. Select chapter for khutbah → 2. Display Arabic and local language translation"
+            }
+          },
+
+          "response_formats": {
+            "success": {
+              "http_status": 200,
+              "content_type": "application/json",
+              "structure": "Varies by endpoint - see individual endpoint documentation"
+            },
+            "error": {
+              "http_status": "400, 404, or 500",
+              "content_type": "application/json",
+              "structure": {
+                "error": "Error message description",
+                "details": "Additional error context (when available)"
+              }
+            }
+          },
+
+          "best_practices": {
+            "caching": "Responses are cached for 1 hour. Implement client-side caching for better performance",
+            "error_handling": "Always check HTTP status codes and handle error responses gracefully",
+            "rate_limiting": "Respect the 100K daily limit on free tier. Implement exponential backoff for retries",
+            "text_encoding": "All Arabic text is UTF-8 encoded. Ensure proper font support for Arabic display",
+            "search_optimization": "Use normalize=true for Arabic search queries to improve matching accuracy"
+          },
+
+          "integration_examples": {
+            "javascript": {
+              "basic_fetch": "fetch('https://quran-api.asrulmunir.workers.dev/api/compare/1/1').then(r => r.json()).then(data => console.log(data))",
+              "search_with_params": "const url = new URL('https://quran-api.asrulmunir.workers.dev/api/search'); url.searchParams.set('q', 'الله'); url.searchParams.set('normalize', 'true'); fetch(url).then(r => r.json())",
+              "error_handling": "fetch(url).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }).catch(err => console.error('API Error:', err))"
+            },
+            "python": {
+              "basic_request": "import requests; response = requests.get('https://quran-api.asrulmunir.workers.dev/api/compare/1/1'); data = response.json()",
+              "search_request": "params = {'q': 'الله', 'normalize': True, 'limit': 10}; response = requests.get('https://quran-api.asrulmunir.workers.dev/api/search', params=params)",
+              "error_handling": "response.raise_for_status()  # Raises exception for HTTP errors"
+            },
+            "curl": {
+              "basic_request": "curl 'https://quran-api.asrulmunir.workers.dev/api/info'",
+              "search_request": "curl 'https://quran-api.asrulmunir.workers.dev/api/search?q=الله&normalize=true&limit=5'",
+              "with_headers": "curl -H 'Accept: application/json' 'https://quran-api.asrulmunir.workers.dev/api/compare/2/255'"
+            }
+          },
+
+          "llm_assistant_guidance": {
+            "when_to_use": [
+              "User asks about Quran verses, chapters, or translations",
+              "User wants to search for specific Arabic terms in the Quran",
+              "User needs Islamic content for applications or research",
+              "User wants to compare different translations of verses",
+              "User asks for Quranic statistics or information"
+            ],
+            "how_to_help": [
+              "Use /api/search to find verses containing specific Arabic terms",
+              "Use /api/compare to show verses in Arabic with English and Malay translations",
+              "Use /api/chapters to list all chapters for navigation",
+              "Use /api/verses for specific verse lookups",
+              "Always provide both Arabic text and translations when available",
+              "Explain the context and significance of verses when appropriate",
+              "Respect Islamic etiquette when handling Quranic content"
+            ],
+            "response_formatting": [
+              "Display Arabic text in proper RTL format when possible",
+              "Include translation attribution (Hilali-Khan for English, Basmeih for Malay)",
+              "Provide chapter and verse references (e.g., Al-Fatihah 1:1)",
+              "Format search results clearly with verse references",
+              "Include relevant context about chapters or verses"
+            ]
+          },
+
+          "islamic_etiquette": {
+            "handling_quran": "This API provides the Holy Quran text with utmost respect and accuracy",
+            "attribution": "Always attribute translations to their respective translators",
+            "context": "Provide appropriate Islamic context when discussing verses",
+            "respect": "Handle all Quranic content with reverence and respect"
+          }
+        };
+
+        return addCorsHeaders(new Response(JSON.stringify(llmGuide, null, 2), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      }
       
       return addCorsHeaders(new Response(JSON.stringify({ error: 'Not Found' }), { 
         status: 404,
